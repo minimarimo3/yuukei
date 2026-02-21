@@ -494,7 +494,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ExplorerItemScanner
   targetObject: {fileID: 1391266907}
-  targetName: "\u30C6\u30B9\u30C8"
+  targetName: test
+  scannerExePath: C:\Users\minimarimo3\Workspace\UiaScanner\bin\Release\net8.0-windows\win-x64\publish\UiaScanner.exe
 --- !u!1001 &2113956282
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,7 +1,7 @@
 using System;
-using System.Reflection;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using UnityEngine;
-using System.IO;
 
 public class ExplorerItemScanner : MonoBehaviour
 {
@@ -11,109 +11,83 @@ public class ExplorerItemScanner : MonoBehaviour
     [Header("探したいファイル/フォルダ名")]
     public string targetName = "テスト";
 
-    private bool _isInitialized = false;
-    private Assembly _uiaClient;
-    private Assembly _uiaTypes;
+    [Header("先ほど作成した UiaScanner.exe のフルパス")]
+    public string scannerExePath = @"C:\Users\minimarimo3\Workspace\UiaScanner\bin\Release\net8.0-windows\win-x64\publish\UiaScanner.exe"; // ※実際のパスに書き換えてください
 
-    void Start()
-    {
-        // DLLの依存関係エラーを防ぐため、足りないファイルがあれば自動で探す魔法陣をセット
-        AppDomain.CurrentDomain.AssemblyResolve += ResolveWPFAssembly;
-
-        try
-        {
-            // Windowsのシステムフォルダの場所
-            string baseDir = @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\WPF\";
-            if (!Directory.Exists(baseDir))
-            {
-                baseDir = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\WPF\"; // 念のため32bit用
-            }
-
-            // プロジェクト外にあるDLLを、実行時にステルスで読み込む
-            _uiaClient = Assembly.LoadFrom(Path.Combine(baseDir, "UIAutomationClient.dll"));
-            _uiaTypes = Assembly.LoadFrom(Path.Combine(baseDir, "UIAutomationTypes.dll"));
-            _isInitialized = true;
-            
-            Debug.Log("UIAutomationのステルス起動に成功しました！");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("初期化エラー: " + e.Message);
-        }
-    }
-
-    // 足りないシステムDLL（PresentationCoreなど）を要求されたら、Windowsから直接渡してあげる関数
-    private Assembly ResolveWPFAssembly(object sender, ResolveEventArgs args)
-    {
-        string name = new AssemblyName(args.Name).Name;
-        string[] searchDirs = {
-            @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\WPF\",
-            @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\",
-            @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\WPF\",
-            @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\"
-        };
-
-        foreach (var dir in searchDirs)
-        {
-            string path = Path.Combine(dir, name + ".dll");
-            if (File.Exists(path)) return Assembly.LoadFrom(path);
-        }
-        return null;
-    }
-
-    void Update()
+    async void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (_isInitialized) ScanAndPlace(targetName);
-            else Debug.LogWarning("UIAutomationがまだ準備できていません。");
+            await ScanAndPlaceAsync(targetName);
         }
     }
 
-    public void ScanAndPlace(string name)
+    public async Task ScanAndPlaceAsync(string name)
     {
+        UnityEngine.Debug.Log($"「{name}」をスキャン中...");
+
+        ProcessStartInfo psi = new ProcessStartInfo
+        {
+            FileName = scannerExePath,
+            Arguments = $"\"{name}\"",
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true, // 【追加】標準エラー出力を受け取る
+            StandardOutputEncoding = System.Text.Encoding.UTF8,
+            StandardErrorEncoding = System.Text.Encoding.UTF8,  // 【追加】エラーもUTF-8で受け取る
+            CreateNoWindow = true
+        };
+
         try
         {
-            Debug.Log($"「{name}」をスキャン中...");
-
-            // DLLの型を動的に取得する
-            Type autoElementType = _uiaClient.GetType("System.Windows.Automation.AutomationElement");
-            Type propConditionType = _uiaClient.GetType("System.Windows.Automation.PropertyCondition");
-            Type treeScopeType = _uiaTypes.GetType("System.Windows.Automation.TreeScope");
-
-            // 検索準備
-            object rootElement = autoElementType.GetProperty("RootElement").GetValue(null);
-            object nameProperty = autoElementType.GetField("NameProperty").GetValue(null);
-            object condition = Activator.CreateInstance(propConditionType, new object[] { nameProperty, name });
-            object treeScope = Enum.Parse(treeScopeType, "Descendants");
-
-            // 実行
-            object foundElement = autoElementType.GetMethod("FindFirst").Invoke(rootElement, new object[] { treeScope, condition });
-
-            if (foundElement != null)
+            using (Process process = Process.Start(psi))
             {
-                // 結果の座標を取得
-                object current = autoElementType.GetProperty("Current").GetValue(foundElement);
-                object rect = current.GetType().GetProperty("BoundingRectangle").GetValue(current);
+                // 出力とエラーの両方を同時に読み取る
+                var outputTask = process.StandardOutput.ReadToEndAsync();
+                var errorTask = process.StandardError.ReadToEndAsync();
 
-                Type rectType = rect.GetType();
-                double left = (double)rectType.GetProperty("Left").GetValue(rect);
-                double top = (double)rectType.GetProperty("Top").GetValue(rect);
-                double width = (double)rectType.GetProperty("Width").GetValue(rect);
-                double height = (double)rectType.GetProperty("Height").GetValue(rect);
+                await Task.WhenAll(outputTask, errorTask);
+                process.WaitForExit();
 
-                Debug.Log($"発見! 座標: X={left}, Y={top}, 幅={width}, 高さ={height}");
-                MoveTargetToScreenRect((float)left, (float)top, (float)width, (float)height);
-            }
-            else
-            {
-                Debug.LogWarning($"「{name}」が見つかりませんでした。");
+                string output = outputTask.Result;
+                string error = errorTask.Result;
+
+                // もしエラー出力があればUnityのコンソールに赤文字で出す
+                if (!string.IsNullOrWhiteSpace(error))
+                {
+                    UnityEngine.Debug.LogError($"[外部アプリ エラー出力]:\n{error}");
+                }
+
+                ParseAndMove(output.Trim());
             }
         }
         catch (Exception e)
         {
-            // 動的呼び出し時のエラーは InnerException に詳細が入る
-            Debug.LogError($"エラー: {e.InnerException?.Message ?? e.Message}\n{e.StackTrace}");
+            UnityEngine.Debug.LogError($"外部アプリの起動自体に失敗しました: {e.Message}");
+        }
+    }
+
+    void ParseAndMove(string output)
+    {
+        // C#コンソールアプリからの出力内容に応じて処理
+        if (output.StartsWith("SUCCESS:"))
+        {
+            string data = output.Substring(8); // "SUCCESS:" の後を取り出す
+            string[] parts = data.Split(',');
+
+            if (parts.Length == 4 &&
+                float.TryParse(parts[0], out float left) &&
+                float.TryParse(parts[1], out float top) &&
+                float.TryParse(parts[2], out float width) &&
+                float.TryParse(parts[3], out float height))
+            {
+                UnityEngine.Debug.Log($"発見! 座標: X={left}, Y={top}, 幅={width}, 高さ={height}");
+                MoveTargetToScreenRect(left, top, width, height);
+            }
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning($"スキャン結果: {output}");
         }
     }
 
@@ -121,9 +95,11 @@ public class ExplorerItemScanner : MonoBehaviour
     {
         if (targetObject == null || Camera.main == null) return;
 
+        // 対象領域の中心座標を計算
         float centerX = left + width / 2f;
         float centerY = top + height / 2f;
 
+        // Unityのスクリーン座標系（左下が原点）に変換
         float unityScreenY = Screen.currentResolution.height - centerY;
 
         Vector3 screenPos = new Vector3(centerX, unityScreenY, 3f);
