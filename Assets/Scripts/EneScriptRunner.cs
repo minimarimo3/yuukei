@@ -6,6 +6,10 @@ using System;
 
 public class EneScriptRunner : MonoBehaviour
 {
+    [Header("UIの参照")]
+    // 先ほど作成したUIコントローラーを紐づけます
+    public MascotChatController chatController;
+
     // Unityの画面（インスペクター）からテキストを入力できるようにする
     [TextArea(10, 20)]
     public string scriptContent = @"＃＃　PC整理イベント
@@ -55,6 +59,14 @@ public class EneScriptRunner : MonoBehaviour
         // 4. 実行（Visitor）：ツリーを巡回して処理を行う
         // コントローラーをExecutorに渡す！
         var visitor = new EneExecutor(vrmController);
+        if (chatController != null)
+        {
+            visitor.OnDialogueTextRead = (text) =>
+            {
+                // UIの待ち行列（Queue）に読み取ったセリフを追加します
+                chatController.EnqueueMessage(text);
+            };
+        }
         visitor.Visit(tree);
     }
 }
@@ -74,6 +86,9 @@ public class EneExecutor : EneScriptBaseVisitor<object>
         _windows = new WindowsActions();
     }
 
+    // UIへテキストを送るためのコールバック
+    public Action<string> OnDialogueTextRead;
+
     // --- ① 基本的な動作 ---
 
     // 会話
@@ -84,6 +99,7 @@ public class EneExecutor : EneScriptBaseVisitor<object>
 
         Debug.Log($"<color=cyan>【エネ】{content}</color>");
         if (_vrm != null) _vrm.Speak(content);
+        OnDialogueTextRead?.Invoke(content); // UIへテキストを送信
         return null;
     }
 

@@ -4,10 +4,10 @@
   <Project Path="VRM10.csproj" />
   <Project Path="VRM10.MToon10.csproj" />
   <Project Path="UniGLTF.Editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="UniGLTF.Tests.csproj" />
   <Project Path="UniGLTF.Utils.csproj" />
   <Project Path="VRM10.MToon10.Tests.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="VRM10.Tests.csproj" />
   <Project Path="VRM10.MToon10.Editor.csproj" />
   <Project Path="UniGLTF.UniUnlit.Editor.csproj" />
