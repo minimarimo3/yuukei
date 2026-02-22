@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -14,51 +15,46 @@ public class ExplorerItemScanner : MonoBehaviour
     [Header("先ほど作成した UiaScanner.exe のフルパス")]
     public string scannerExePath = @"C:\Users\minimarimo3\Workspace\UiaScanner\bin\Release\net8.0-windows\win-x64\publish\UiaScanner.exe"; // ※実際のパスに書き換えてください
 
-    async void Update()
+    private Process scannerProcess;
+    private CancellationTokenSource cts;
+
+    // メインスレッドでの処理用変数
+    private bool hasNewData = false;
+    private float newLeft, newTop, newWidth, newHeight;
+    private readonly object dataLock = new object();
+
+    void Start()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            await ScanAndPlaceAsync(targetName);
-        }
+        cts = new CancellationTokenSource();
+        StartScannerProcess();
     }
 
-    public async Task ScanAndPlaceAsync(string name)
+    void StartScannerProcess()
     {
-        UnityEngine.Debug.Log($"「{name}」をスキャン中...");
+        UnityEngine.Debug.Log($"「{targetName}」のスキャンプロセスを起動します...");
 
         ProcessStartInfo psi = new ProcessStartInfo
         {
             FileName = scannerExePath,
-            Arguments = $"\"{name}\"",
+            Arguments = $"\"{targetName}\"",
             UseShellExecute = false,
+            RedirectStandardInput = true,
             RedirectStandardOutput = true,
-            RedirectStandardError = true, // 【追加】標準エラー出力を受け取る
+            RedirectStandardError = true,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
-            StandardErrorEncoding = System.Text.Encoding.UTF8,  // 【追加】エラーもUTF-8で受け取る
+            StandardErrorEncoding = System.Text.Encoding.UTF8,
             CreateNoWindow = true
         };
 
         try
         {
-            using (Process process = Process.Start(psi))
+            scannerProcess = Process.Start(psi);
+
+            if (scannerProcess != null)
             {
-                // 出力とエラーの両方を同時に読み取る
-                var outputTask = process.StandardOutput.ReadToEndAsync();
-                var errorTask = process.StandardError.ReadToEndAsync();
-
-                await Task.WhenAll(outputTask, errorTask);
-                process.WaitForExit();
-
-                string output = outputTask.Result;
-                string error = errorTask.Result;
-
-                // もしエラー出力があればUnityのコンソールに赤文字で出す
-                if (!string.IsNullOrWhiteSpace(error))
-                {
-                    UnityEngine.Debug.LogError($"[外部アプリ エラー出力]:\n{error}");
-                }
-
-                ParseAndMove(output.Trim());
+                // 非同期で標準出力と標準エラー出力を読み取る
+                _ = ReadOutputAsync(scannerProcess, cts.Token);
+                _ = ReadErrorAsync(scannerProcess, cts.Token);
             }
         }
         catch (Exception e)
@@ -67,12 +63,52 @@ public class ExplorerItemScanner : MonoBehaviour
         }
     }
 
-    void ParseAndMove(string output)
+    async Task ReadOutputAsync(Process process, CancellationToken token)
     {
-        // C#コンソールアプリからの出力内容に応じて処理
+        try
+        {
+            while (!process.HasExited && !token.IsCancellationRequested)
+            {
+                string line = await process.StandardOutput.ReadLineAsync();
+                if (line == null) break;
+                
+                HandleOutputLine(line);
+            }
+        }
+        catch (Exception e)
+        {
+            if (!token.IsCancellationRequested)
+                UnityEngine.Debug.LogError($"出力の読み取り中にエラーが発生しました: {e.Message}");
+        }
+    }
+
+    async Task ReadErrorAsync(Process process, CancellationToken token)
+    {
+        try
+        {
+            while (!process.HasExited && !token.IsCancellationRequested)
+            {
+                string line = await process.StandardError.ReadLineAsync();
+                if (line == null) break;
+
+                UnityEngine.Debug.LogError($"[外部アプリ エラー出力]: {line}");
+            }
+        }
+        catch (Exception e)
+        {
+            if (!token.IsCancellationRequested)
+                UnityEngine.Debug.LogError($"エラー出力の読み取り中にエラーが発生しました: {e.Message}");
+        }
+    }
+
+    void HandleOutputLine(string output)
+    {
+        output = output.Trim();
+        if (string.IsNullOrEmpty(output)) return;
+
         if (output.StartsWith("SUCCESS:"))
         {
-            string data = output.Substring(8); // "SUCCESS:" の後を取り出す
+            string data = output.Substring(8);
             string[] parts = data.Split(',');
 
             if (parts.Length == 4 &&
@@ -81,13 +117,45 @@ public class ExplorerItemScanner : MonoBehaviour
                 float.TryParse(parts[2], out float width) &&
                 float.TryParse(parts[3], out float height))
             {
-                UnityEngine.Debug.Log($"発見! 座標: X={left}, Y={top}, 幅={width}, 高さ={height}");
-                MoveTargetToScreenRect(left, top, width, height);
+                lock (dataLock)
+                {
+                    newLeft = left;
+                    newTop = top;
+                    newWidth = width;
+                    newHeight = height;
+                    hasNewData = true;
+                }
             }
         }
         else
         {
             UnityEngine.Debug.LogWarning($"スキャン結果: {output}");
+        }
+    }
+
+    void Update()
+    {
+        // メインスレッドで座標更新を行う
+        bool shouldUpdate = false;
+        float l = 0, t = 0, w = 0, h = 0;
+
+        lock (dataLock)
+        {
+            if (hasNewData)
+            {
+                shouldUpdate = true;
+                l = newLeft;
+                t = newTop;
+                w = newWidth;
+                h = newHeight;
+                hasNewData = false;
+            }
+        }
+
+        if (shouldUpdate)
+        {
+            UnityEngine.Debug.Log($"発見! 座標変化: X={l}, Y={t}, 幅={w}, 高さ={h}");
+            MoveTargetToScreenRect(l, t, w, h);
         }
     }
 
@@ -118,6 +186,51 @@ public class ExplorerItemScanner : MonoBehaviour
         {
             // スクリプトがない場合は今まで通り瞬時移動
             targetObject.position = worldPos;
+        }
+    }
+
+    void OnDestroy()
+    {
+        CleanupProcess();
+    }
+
+    void OnApplicationQuit()
+    {
+        CleanupProcess();
+    }
+
+    void CleanupProcess()
+    {
+        if (cts != null)
+        {
+            cts.Cancel();
+            cts.Dispose();
+            cts = null;
+        }
+
+        if (scannerProcess != null && !scannerProcess.HasExited)
+        {
+            try
+            {
+                // UiaScanner側で exit を受け取って終了するようになっているため、まず標準入力に書き込む
+                scannerProcess.StandardInput.WriteLine("exit");
+                scannerProcess.StandardInput.Close();
+                
+                // 少し待って終了しなかったら強制終了する
+                if (!scannerProcess.WaitForExit(1000))
+                {
+                    scannerProcess.Kill();
+                }
+            }
+            catch
+            {
+                // すでに終了している場合などの例外は無視
+            }
+            finally
+            {
+                scannerProcess.Dispose();
+                scannerProcess = null;
+            }
         }
     }
 }
