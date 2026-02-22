@@ -95,16 +95,29 @@ public class ExplorerItemScanner : MonoBehaviour
     {
         if (targetObject == null || Camera.main == null) return;
 
-        // 対象領域の中心座標を計算
         float centerX = left + width / 2f;
         float centerY = top + height / 2f;
 
-        // Unityのスクリーン座標系（左下が原点）に変換
         float unityScreenY = Screen.currentResolution.height - centerY;
 
-        Vector3 screenPos = new Vector3(centerX, unityScreenY, 3f);
+        Vector3 screenPos = new Vector3(centerX, unityScreenY, 3f); // 3f はカメラからの距離
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
 
-        targetObject.position = worldPos;
+        // CyberDiveController がアタッチされているか確認して実行
+        var diveController = targetObject.GetComponent<CyberDiveController>();
+        if (diveController != null)
+        {
+            // アニメーションを開始し、完了後にフォルダを開くなどの処理を繋げる
+            diveController.StartDive(worldPos, () => 
+            {
+                UnityEngine.Debug.Log("ダイブ完了！ここにフォルダを開く処理などを入れます。");
+                // TODO: 実際のフォルダパスを特定して WindowsActions.OpenApplication() を呼ぶ
+            });
+        }
+        else
+        {
+            // スクリプトがない場合は今まで通り瞬時移動
+            targetObject.position = worldPos;
+        }
     }
 }
