@@ -2,6 +2,8 @@ using UnityEngine;
 using UniVRM10;
 using System.Threading.Tasks;
 using System.Collections;
+using UnityFx.Outline;
+using UnityEngine.UI;
 
 public class SimpleVRMController : MonoBehaviour
 {
@@ -25,8 +27,10 @@ public class SimpleVRMController : MonoBehaviour
             Debug.Log($"VRMロード開始: {path}");
             currentVrm = await Vrm10.LoadPathAsync(path);
             Debug.Log("VRMロード完了！");
+            currentVrm.gameObject.transform.position = new Vector3(2, 0, 0);
 
             // --- 追加実装：ロード完了後の動的セットアップ ---
+            SetupModelOutline(currentVrm.gameObject);
             SetupCyberDive(currentVrm.gameObject);
 
         }
@@ -34,6 +38,16 @@ public class SimpleVRMController : MonoBehaviour
         {
             Debug.LogError($"VRMロード失敗...: {e}");
         }
+    }
+
+    private void SetupModelOutline(GameObject vrmObject)
+    {
+        var outlineEffect = Camera.main.GetComponent<OutlineEffect>();
+
+        outlineEffect.AddGameObject(vrmObject);
+        var layer = outlineEffect.OutlineLayers[0];
+        layer.OutlineColor = Color.gray;
+        layer.OutlineWidth = 4;
     }
 
     private void SetupCyberDive(GameObject vrmObject)
