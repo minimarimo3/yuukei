@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Theme: Cyber Space (Cyan/Blue)</title>
+    <style>
+        body {
+            background-color: #000814;
+            color: #00ffcc;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .label {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .item-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* 共通サイバー枠 */
+        .cyber-border {
+            border: 1px solid #00ffcc;
+            box-shadow: 0 0 5px rgba(0, 255, 204, 0.5) inset, 0 0 5px rgba(0, 255, 204, 0.5);
+            background-color: rgba(0, 17, 34, 0.8);
+        }
+
+        /* 1. Input Box */
+        .moe-input {
+            width: 200px;
+            height: 30px;
+            border: 1px dashed #00aaff;
+            background-color: rgba(0, 255, 204, 0.1);
+        }
+
+        /* 2. Button */
+        .moe-btn {
+            padding: 4px 20px;
+            color: #000;
+            background-color: #00ffcc;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid #fff;
+        }
+
+        /* 3. 吹き出し */
+        .moe-bubble {
+            position: relative;
+            width: 150px;
+            padding: 10px;
+            border: 1px solid #00ffcc;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 204, 0.1) 2px, rgba(0, 255, 204, 0.1) 4px);
+            text-align: center;
+        }
+
+        .moe-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            border-width: 10px 10px 0 0;
+            border-style: solid;
+            border-color: #00ffcc transparent transparent transparent;
+        }
+
+        /* ウィンドウ共通 */
+        .moe-window {
+            width: 280px;
+            padding: 2px;
+        }
+
+        .title-bar {
+            padding: 2px 6px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .close-btn {
+            width: 14px;
+            height: 14px;
+            background-color: transparent;
+            border: 1px solid currentColor;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .content {
+            min-height: 60px;
+            padding: 8px;
+            border-top: 1px solid;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* 4. Warning Window */
+        .win-warn {
+            border-color: #ffaa00;
+            color: #ffaa00;
+            box-shadow: 0 0 5px rgba(255, 170, 0, 0.5) inset;
+        }
+
+        .win-warn .title-bar {
+            background-color: rgba(255, 170, 0, 0.2);
+        }
+
+        /* 5. Error Window */
+        .win-err {
+            border-color: #ff0033;
+            color: #ff0033;
+            box-shadow: 0 0 5px rgba(255, 0, 51, 0.5) inset;
+        }
+
+        .win-err .title-bar {
+            background-color: rgba(255, 0, 51, 0.2);
+        }
+
+        /* 6. Bugged Error Window */
+        .win-bug {
+            border: 2px dashed #ff0033;
+            color: #ff0033;
+            position: relative;
+            left: -2px;
+        }
+
+        .win-bug .title-bar {
+            background: repeating-linear-gradient(90deg, #ff0033 0%, #000 10%, #ff0033 20%);
+            color: #fff;
+        }
+
+        .win-bug .content {
+            background-image: radial-gradient(circle, #ff0033 1px, transparent 1px);
+            background-size: 4px 4px;
+            opacity: 0.8;
+        }
+
+        /* 7. Info Window */
+        .win-info {
+            border-color: #00aaff;
+            color: #00aaff;
+            box-shadow: 0 0 5px rgba(0, 170, 255, 0.5) inset;
+        }
+
+        .win-info .title-bar {
+            background-color: rgba(0, 170, 255, 0.2);
+        }
+
+        /* 8. Progress BG */
+        .prog-bg {
+            width: 200px;
+            height: 10px;
+            border: 1px solid #005588;
+            background-color: #001122;
+        }
+
+        /* 9. Progress Fill */
+        .prog-fill {
+            width: 150px;
+            height: 10px;
+            background-color: #00ffcc;
+            box-shadow: 0 0 8px #00ffcc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="item-container">
+        <div class="label">1. Text Area</div>
+        <div class="moe-input"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">2. Button</div>
+        <div class="moe-btn">EXECUTE</div>
+    </div>
+    <div class="item-container">
+        <div class="label">3. Speech Bubble</div>
+        <div class="moe-bubble cyber-border">Master?</div>
+    </div>
+    <div class="item-container">
+        <div class="label">4. Warning Window</div>
+        <div class="moe-window cyber-border win-warn">
+            <div class="title-bar"><span>> WARNING</span>
+                <div class="close-btn">X</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">5. Error Window</div>
+        <div class="moe-window cyber-border win-err">
+            <div class="title-bar"><span>> ERROR</span>
+                <div class="close-btn">X</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">6. Bugged Window</div>
+        <div class="moe-window cyber-border win-bug">
+            <div class="title-bar"><span>> C0RRUPTED</span>
+                <div class="close-btn">X</div>
+            </div>
+            <div class="content">NULL_PTR_EXCEPTION<br>&%#!@*</div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">7. Info Window</div>
+        <div class="moe-window cyber-border win-info">
+            <div class="title-bar"><span>> INFO</span>
+                <div class="close-btn">X</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">8. Progress (BG)</div>
+        <div class="prog-bg"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">9. Progress (Fill)</div>
+        <div class="prog-fill"></div>
+    </div>
+</body>
+
+</html>

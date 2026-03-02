@@ -1,0 +1,108 @@
+// ==========================================================================
+// SampleDaihonHandler.cs
+// IUniTaskActionHandler を実装するサンプル MonoBehaviour。
+// Unity の Console にセリフや関数呼び出しのログを出力するデモです。
+// ==========================================================================
+
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Daihon;
+using Daihon.Unity;
+using UnityEngine;
+
+namespace Daihon.Samples
+{
+    /// <summary>
+    /// DaihonScript の動作確認用サンプル MonoBehaviour。
+    /// Inspector で台本テキストを設定するか、デフォルトのサンプル台本を使用します。
+    /// </summary>
+    public class SampleDaihonHandler : MonoBehaviour, IUniTaskActionHandler
+    {
+        [Header("台本テキスト（空欄の場合はサンプルを使用）")]
+        [SerializeField, TextArea(10, 30)]
+        private string _scriptText = "";
+
+        [Header("セリフ表示の待機時間（秒）")]
+        [SerializeField]
+        private float _dialogueWaitSeconds = 1.5f;
+
+        private void Start()
+        {
+            RunSampleAsync().Forget();
+        }
+
+        private async UniTaskVoid RunSampleAsync()
+        {
+            var script = string.IsNullOrWhiteSpace(_scriptText) ? GetSampleScript() : _scriptText;
+            var store = new SimpleVariableStore();
+
+            Debug.Log("<color=cyan>[Daihon] ===== 台本の実行を開始します =====</color>");
+            await DaihonRunner.RunAsync(script, this, store);
+            Debug.Log("<color=cyan>[Daihon] ===== 台本の実行が完了しました =====</color>");
+        }
+
+        // ================================================================
+        // IUniTaskActionHandler の実装
+        // ================================================================
+
+        /// <summary>セリフを表示し、指定秒数待機する。</summary>
+        public async UniTask ShowDialogueAsync(string text)
+        {
+            Debug.Log($"<color=yellow>[セリフ]</color> {text}");
+
+            // 実際のプロジェクトでは、ここで UI テキストの文字送り +
+            // クリック待ちなどを実装します。
+            await UniTask.Delay(
+                System.TimeSpan.FromSeconds(_dialogueWaitSeconds),
+                cancellationToken: this.GetCancellationTokenOnDestroy());
+        }
+
+        /// <summary>関数呼び出しをログ出力する。</summary>
+        public UniTask<DaihonValue> CallFunctionAsync(
+            string functionName,
+            IReadOnlyList<DaihonValue> positionalArgs,
+            IReadOnlyDictionary<string, DaihonValue> namedArgs)
+        {
+            // 引数を文字列に整形
+            var args = new List<string>();
+            for (int i = 0; i < positionalArgs.Count; i++)
+                args.Add(positionalArgs[i].ToDisplayString());
+            foreach (var kv in namedArgs)
+                args.Add($"{kv.Key}={kv.Value.ToDisplayString()}");
+
+            var argsStr = args.Count > 0 ? string.Join(", ", args) : "なし";
+            Debug.Log($"<color=green>[関数呼出]</color> ＜{functionName}＞ 引数: {argsStr}");
+
+            // 実際のプロジェクトでは、関数名に応じて
+            // アニメーション再生やSE再生などを行います。
+            // 例:
+            // switch (functionName)
+            // {
+            //     case "表情":
+            //         SetExpression(positionalArgs[0].AsString());
+            //         break;
+            //     case "待つ":
+            //         await UniTask.Delay(TimeSpan.FromSeconds(positionalArgs[0].AsNumber()));
+            //         break;
+            // }
+
+            return UniTask.FromResult(DaihonValue.None);
+        }
+
+        // ================================================================
+        // サンプル台本
+        // ================================================================
+
+        private static string GetSampleScript()
+        {
+            return @"## あいさつイベント
+
+### メイン
+「こんにちは！」
+＜表情 笑顔＞
+「今日もいい天気ですね。」
+「一緒に遊びましょう！」
+";
+        }
+    }
+}

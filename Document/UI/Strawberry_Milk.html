@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Theme: Strawberry Milk</title>
+    <style>
+        body {
+            background-color: #495057;
+            color: #555;
+            font-family: 'Hiragino Maru Gothic ProN', sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .label {
+            color: #f8f9fa;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .item-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* 共通ソフト枠 */
+        .soft-box {
+            border-radius: 16px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 1. Input Box */
+        .moe-input {
+            width: 200px;
+            height: 32px;
+            border-radius: 16px;
+            border: 2px solid #ffb3c6;
+            background-color: #fff0f3;
+        }
+
+        /* 2. Button */
+        .moe-btn {
+            padding: 8px 24px;
+            border-radius: 999px;
+            background-color: #ffb3c6;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #ff87a3;
+            text-align: center;
+        }
+
+        /* 3. 吹き出し */
+        .moe-bubble {
+            position: relative;
+            width: 160px;
+            padding: 12px;
+            background-color: #fff0f3;
+            border-radius: 16px;
+            color: #d6336c;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .moe-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 24px;
+            border-width: 12px 12px 0 0;
+            border-style: solid;
+            border-color: #fff0f3 transparent transparent transparent;
+        }
+
+        /* ウィンドウ共通 */
+        .soft-window {
+            width: 280px;
+            overflow: hidden;
+        }
+
+        .title-bar {
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            color: #555;
+        }
+
+        .content {
+            padding: 15px;
+            min-height: 60px;
+            background-color: #fff;
+            font-size: 13px;
+        }
+
+        /* 4. Warning Window */
+        .win-warn .title-bar {
+            background-color: #ffc078;
+        }
+
+        .win-warn .content {
+            background-color: #fff4e6;
+            color: #d9480f;
+        }
+
+        /* 5. Error Window */
+        .win-err .title-bar {
+            background-color: #ff87a3;
+        }
+
+        .win-err .content {
+            background-color: #fff0f3;
+            color: #c92a2a;
+        }
+
+        /* 6. Bugged Error Window (病み風) */
+        .win-bug {
+            border-radius: 16px 4px 24px 8px;
+            box-shadow: 0 8px 0 #d6336c;
+            transform: rotate(2deg);
+        }
+
+        .win-bug .title-bar {
+            background-color: #d6336c;
+            letter-spacing: -1px;
+        }
+
+        .win-bug .content {
+            background-color: #000;
+            color: #ff87a3;
+            border-bottom: 4px wavy #d6336c;
+        }
+
+        /* 7. Info Window */
+        .win-info .title-bar {
+            background-color: #ffb3c6;
+        }
+
+        .win-info .content {
+            background-color: #fff0f3;
+            color: #d6336c;
+        }
+
+        /* 8. Progress BG */
+        .prog-bg {
+            width: 220px;
+            height: 16px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 9. Progress Fill */
+        .prog-fill {
+            width: 160px;
+            height: 16px;
+            border-radius: 8px;
+            background-color: #ffb3c6;
+            box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="item-container">
+        <div class="label">1. Text Area</div>
+        <div class="moe-input"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">2. Button</div>
+        <div class="moe-btn">OK ♥</div>
+    </div>
+    <div class="item-container">
+        <div class="label">3. Speech Bubble</div>
+        <div class="moe-bubble soft-box">あのね…</div>
+    </div>
+    <div class="item-container">
+        <div class="label">4. Warning Window</div>
+        <div class="soft-window soft-box win-warn">
+            <div class="title-bar"><span>⚠ ちょっとまってね</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">5. Error Window</div>
+        <div class="soft-window soft-box win-err">
+            <div class="title-bar"><span>✖ だめだよ</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">6. Bugged Window</div>
+        <div class="soft-window soft-box win-bug">
+            <div class="title-bar"><span>こ わ さ な い で</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content">ｲﾀｲｲﾀｲ...</div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">7. Info Window</div>
+        <div class="soft-window soft-box win-info">
+            <div class="title-bar"><span>ℹ おしらせ</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">8. Progress (BG)</div>
+        <div class="prog-bg"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">9. Progress (Fill)</div>
+        <div class="prog-fill"></div>
+    </div>
+</body>
+
+</html>

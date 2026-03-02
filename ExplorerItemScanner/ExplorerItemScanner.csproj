@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <!-- 発行(Publish)時に Unity 側の StreamingAssets へ自動コピーする -->
+  <Target Name="CopyToUnityStreamingAssets" AfterTargets="Publish">
+    <PropertyGroup>
+      <!-- プロジェクトのディレクトリを起点として、相対パスで動的に解決 (絶対パス不可の要件に対応) -->
+      <UnitySubFolderPath>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\Yuukei\Assets\StreamingAssets\ExplorerItemScanner'))</UnitySubFolderPath>
+      
+      <!-- 発行時 (PublishDirが存在する) はそこを起点とし、そうでなければビルド時の TargetDir を使う -->
+      <SourceToCopy Condition="'$(PublishDir)' != '' And Exists('$(PublishDir)')">$(PublishDir)</SourceToCopy>
+      <SourceToCopy Condition="'$(SourceToCopy)' == ''">$(TargetDir)</SourceToCopy>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <CopySourceFiles Include="$(SourceToCopy)**\*.*" />
+    </ItemGroup>
+
+    <!-- Unity側に散らからないよう、専用サブフォルダを作成 -->
+    <MakeDir Directories="$(UnitySubFolderPath)" />
+
+    <Message Importance="high" Text="Unity (StreamingAssets) へ成果物をコピーしています..." />
+    <Message Importance="high" Text=" -> Source: $(SourceToCopy)" />
+    <Message Importance="high" Text=" -> Destination: $(UnitySubFolderPath)" />
+
+    <!-- xcopy等に依存せず、MSBuild標準のCopyタスクを使用 -->
+    <Copy SourceFiles="@(CopySourceFiles)"
+          DestinationFolder="$(UnitySubFolderPath)\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>
