@@ -626,6 +626,8 @@ GameObject:
   - component: {fileID: 1332915802}
   - component: {fileID: 1332915803}
   - component: {fileID: 1332915804}
+  - component: {fileID: 1332915805}
+  - component: {fileID: 1332915806}
   m_Layer: 0
   m_Name: Script
   m_TagString: Untagged
@@ -686,7 +688,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExplorerItemScanner
   targetObject: {fileID: 1120862613}
   targetName: "\u30C6\u30B9\u30C8"
-  exeFileName: ExplorerItemScanner.exe
 --- !u!114 &1332915804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -699,6 +700,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a742b471a9738845b7fa215c5b3ec23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiMonitorEnabler
+--- !u!114 &1332915805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332915800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c46202835be3f7943bf5602c930024d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SystemTrayManager
+  iconFileName: tray_icon.ico
+  applicationName: Mascot App
+--- !u!114 &1332915806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332915800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1cae1b34b5e6d140aa3d1ba3e64010a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TaskbarIconHider
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
