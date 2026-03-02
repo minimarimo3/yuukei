@@ -7,6 +7,12 @@
 
 ## 開発者用
 
+### ビルド
+
+Yuukeiがエクスプローラー内のアイテムの情報を取得するために使用するexeをビルドする必要があります。
+`cd ExplorerItemScanner && dotnet publish -c Release`
+これで`Yuukei/Assets/StreamingAssets/ExplorerItemScanner/ExplorerItemScanner.exe`にexeが配置されます。
+
 ### 開発の初期設定
 
 これは開発中に必要な情報というわけではなく、プロジェクトを立ち上げたときにいろいろ困ったのでその対策をメモしているものです。
