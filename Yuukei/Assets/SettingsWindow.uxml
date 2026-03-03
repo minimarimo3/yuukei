@@ -1,15 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
     <ui:VisualElement name="RootContainer" style="flex-grow: 1; align-items: center; justify-content: center; background-color: transparent;">
-        <ui:VisualElement name="SettingsPanel" style="width: 400px; height: 300px; background-color: rgb(40, 40, 40); border-radius: 10px; padding: 10px;">
-            <ui:VisualElement name="DragHandle" style="flex-direction: row; justify-content: space-between; margin-bottom: 10px; border-bottom-width: 1px; border-bottom-color: rgb(100, 100, 100); padding-bottom: 5px;">
-            <ui:Label text="設定 (Settings)" style="color: white; font-size: 18px; -unity-font-style: bold; flex-grow: 1;" />
-        <ui:Button name="CloseButton" text="X" style="width: 30px; height: 30px; background-color: rgb(200, 50, 50); color: white;" />
-    </ui:VisualElement>
+        
+        <ui:VisualElement name="SettingsPanel" style="width: 700px; height: 450px; background-color: rgb(35, 35, 35); border-radius: 8px; overflow: hidden; border-width: 1px; border-color: rgb(80, 80, 80);">
+            
+            <ui:VisualElement name="DragHandle" style="height: 40px; background-color: rgb(25, 25, 25); flex-direction: row; justify-content: space-between; align-items: center; padding-left: 15px; border-bottom-width: 1px; border-bottom-color: rgb(60, 60, 60);">
+                <ui:Label text="Yuukei Settings" style="color: white; font-size: 16px; -unity-font-style: bold; flex-grow: 1;" />
+                <ui:Button name="CloseButton" text="✕" style="width: 40px; height: 40px; background-color: transparent; color: rgb(200, 200, 200); border-width: 0; font-size: 16px; margin: 0;" />
+            </ui:VisualElement>
 
-            <ui:ScrollView name="ContentArea" style="flex-grow: 1;">
-                <ui:Label text="ここは本体の標準設定エリアです。" style="color: rgb(200, 200, 200);" />
+            <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+                
+                <ui:ScrollView name="Sidebar" style="width: 180px; background-color: rgb(30, 30, 30); border-right-width: 1px; border-right-color: rgb(60, 60, 60); padding: 5px;">
+                    
+                    <ui:Label text="システム" style="color: rgb(150, 150, 150); font-size: 12px; margin-top: 10px; margin-bottom: 5px; margin-left: 5px;" />
+                    <ui:Button name="Tab_General" text="一般設定" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    
+                    <ui:Label text="舞台の設定 (拡張)" style="color: rgb(150, 150, 150); font-size: 12px; margin-top: 15px; margin-bottom: 5px; margin-left: 5px;" />
+                    <ui:Button name="Tab_Character" text="キャラクター" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    <ui:Button name="Tab_Script" text="台本" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    <ui:Button name="Tab_Prop" text="小物 (オブジェクト)" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    <ui:Button name="Tab_Theme" text="ウィンドウ (テーマ)" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    <ui:Button name="Tab_Mod" text="MOD (プラグイン)" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    <ui:Button name="Tab_Package" text="パッケージ" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    
+                    <ui:Label text="その他" style="color: rgb(150, 150, 150); font-size: 12px; margin-top: 15px; margin-bottom: 5px; margin-left: 5px;" />
+                    <ui:Button name="Tab_Market" text="マーケットプレイス" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    <ui:Button name="Tab_About" text="アプリについて" style="text-align: left; background-color: transparent; color: white; border-width: 0;" />
+                    
                 </ui:ScrollView>
+
+                <ui:VisualElement name="ContentRoot" style="flex-grow: 1; padding: 15px; background-color: rgb(40, 40, 40);">
+                    <ui:Label name="PageTitle" text="一般設定" style="color: white; font-size: 20px; -unity-font-style: bold; margin-bottom: 15px;" />
+                    
+                    <ui:ScrollView name="ActivePageContent" style="flex-grow: 1;">
+                        <ui:Label name="PlaceholderText" text="ここに設定項目が表示されます。" style="color: rgb(180, 180, 180);" />
+                    </ui:ScrollView>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
