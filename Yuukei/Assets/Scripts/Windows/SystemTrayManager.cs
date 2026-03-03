@@ -11,6 +11,7 @@ public class SystemTrayManager : MonoBehaviour
     [Tooltip("StreamingAssetsフォルダ内の.icoファイル名")]
     [SerializeField] private string iconFileName = "tray_icon.ico";
     [SerializeField] private string applicationName = "Mascot App";
+    [SerializeField] private SettingsUIManager _settingsUI;
 
     private NotifyIcon _notifyIcon;
     private Thread _trayThread;
@@ -109,6 +110,14 @@ public class SystemTrayManager : MonoBehaviour
         // TODO: ここにUnity側の設定画面（Canvas）を表示する処理を記述
         // 例: SettingsPanel.SetActive(true);
         // 必要に応じて、UniWindowControllerを使用してウィンドウを最前面に持ってくる処理を呼ぶ
+        if (_settingsUI != null)
+        {
+            _settingsUI.ShowSettings();
+        }
+        else
+        {
+            Debug.LogError("SettingsUIManager の参照が設定されていません。");
+        }
     }
 
     private void OnDestroy()
