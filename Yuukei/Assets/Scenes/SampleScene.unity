@@ -413,7 +413,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b4e9698b0cdadf45914063c25565363, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SettingsUIManager
-  _windowController: {fileID: 1964602098}
 --- !u!114 &627291336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -673,10 +672,17 @@ PrefabInstance:
       propertyPath: _isTransparent
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2416199871598626845, guid: e893aefd93740714b999573b02916984, type: 3}
+      propertyPath: _allowDropFiles
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2416199871598626844, guid: e893aefd93740714b999573b02916984, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1964602099}
   m_SourcePrefab: {fileID: 100100000, guid: e893aefd93740714b999573b02916984, type: 3}
 --- !u!4 &1206146149 stripped
 Transform:
@@ -697,6 +703,7 @@ GameObject:
   - component: {fileID: 1332915804}
   - component: {fileID: 1332915805}
   - component: {fileID: 1332915806}
+  - component: {fileID: 1332915809}
   m_Layer: 0
   m_Name: Script
   m_TagString: Untagged
@@ -796,17 +803,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1cae1b34b5e6d140aa3d1ba3e64010a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TaskbarIconHider
---- !u!114 &1964602098 stripped
+--- !u!114 &1332915809
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2416199871598626845, guid: e893aefd93740714b999573b02916984, type: 3}
-  m_PrefabInstance: {fileID: 1206146148}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1332915800}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb951500192d2430eb3e306480cc2f31, type: 3}
+  m_Script: {fileID: 11500000, guid: f540f79619ce49b4ba54fef231c3423b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::ConfigManager
+--- !u!1 &1964602097 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2416199871598626844, guid: e893aefd93740714b999573b02916984, type: 3}
+  m_PrefabInstance: {fileID: 1206146148}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1964602099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964602097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c8a87f8f56cc74586467473ff0c9f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FileDropRouter
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
