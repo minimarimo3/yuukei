@@ -32,6 +32,8 @@ public class SettingsUIManager : MonoBehaviour
         { "Tab_About", "アプリについて (About)" }
     };
 
+    private bool _isPositionInitialized = false;
+
     private void Awake()
     {
         _uiDocument = GetComponent<UIDocument>();
@@ -63,9 +65,30 @@ public class SettingsUIManager : MonoBehaviour
         HideSettings();
     }
 
+    private void OnGeometryChanged(GeometryChangedEvent evt)
+    {
+        // 1回実行したら解除し、フラグを立てる
+        _settingsPanel.UnregisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        _isPositionInitialized = true;
+
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+
+        // Flexboxの中央揃え制約から切り離す
+        _settingsPanel.style.position = Position.Absolute;
+        
+        // SettingsPanel のサイズを基準に右下へ配置
+        // ※画面端にぴったりくっつくと見栄えが悪いため、少しマージン(-20など)を取るのが一般的です
+        _settingsPanel.style.left = screenWidth - _settingsPanel.layout.width - 20;
+        _settingsPanel.style.top = screenHeight - _settingsPanel.layout.height - 40; // Windowsタスクバーを考慮して下部は少し多めに確保
+    }
+
     public void ShowSettings()
     {
         _rootContainer.style.display = DisplayStyle.Flex;
+        if (!_isPositionInitialized) {
+            _settingsPanel.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
         // 開いたときは常に「一般設定」を表示する
         SwitchPage("Tab_General", _tabTitleMap["Tab_General"]);
     }
