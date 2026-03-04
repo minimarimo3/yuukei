@@ -95,6 +95,19 @@ public class SettingsUIManager : MonoBehaviour
         SwitchPage("Tab_General", _tabTitleMap["Tab_General"]);
     }
 
+    /// <summary>
+    /// 設定画面を開き、キャラクタータブを直接表示する
+    /// </summary>
+    public void ShowCharacterTab()
+    {
+        if (_rootContainer == null) return;
+        _rootContainer.style.display = DisplayStyle.Flex;
+        if (!_isPositionInitialized) {
+            _settingsPanel.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+        }
+        SwitchPage("Tab_Character", _tabTitleMap["Tab_Character"]);
+    }
+
     public void HideSettings()
     {
         if (_rootContainer == null) return;

@@ -9,6 +9,7 @@ public class CharacterManager : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private ConfigManager configManager;
+    [SerializeField] private SettingsUIManager settingsUIManager;
     
     [Header("Settings")]
     [SerializeField, Tooltip("ロードしたVRMを配置する親オブジェクト")] 
@@ -48,6 +49,19 @@ public class CharacterManager : MonoBehaviour
     private void HandleConfigLoaded()
     {
         if (configManager?.Settings == null) return;
+
+        // キャラクターが一つも登録されていない場合、設定画面を開いて追加を促す
+        if (configManager.Settings.savedCharacters == null 
+            || configManager.Settings.savedCharacters.Count == 0)
+        {
+            Debug.Log("[CharacterManager] キャラクターが未登録です。設定画面を開きます。");
+            if (settingsUIManager != null)
+            {
+                settingsUIManager.ShowCharacterTab();
+            }
+            return;
+        }
+
         var currentId = configManager.Settings.currentCharacterId;
         LoadCharacterAsync(currentId).ConfigureAwait(false);
     }

@@ -19,4 +19,5 @@
   <Project Path="VrmLibTests.csproj" />
   <Project Path="VRM10.MToon10.Tests.csproj" />
   <Project Path="UniHumanoid.Editor.Tests.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>
