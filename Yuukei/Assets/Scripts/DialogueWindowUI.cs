@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // TextMeshProを使用
+using TMPro;
 
 public class DialogueWindowUI : MonoBehaviour
 {
@@ -10,25 +10,43 @@ public class DialogueWindowUI : MonoBehaviour
     [SerializeField] private Image _tailImage;
     [SerializeField] private TextMeshProUGUI _messageText;
 
-    // 動的に生成したスプライトの参照を保持（メモリ解放用）
+    // --- プレハブの初期状態（デフォルト値）のキャッシュ ---
+    private Sprite _defaultBgSprite;
+    private Sprite _defaultTailSprite;
+    private Vector2 _defaultTextOffsetMin;
+    private Vector2 _defaultTextOffsetMax;
+    private Color _defaultFontColor;
+    private float _defaultFontSize;
+
+    // --- 動的生成スプライト（メモリ解放用） ---
     private Sprite _dynamicBgSprite;
     private Sprite _dynamicTailSprite;
 
+    private void Awake()
+    {
+        // 起動時（プレハブの状態）の各種パラメータをデフォルトとして記憶
+        if (_backgroundImage != null) _defaultBgSprite = _backgroundImage.sprite;
+        if (_tailImage != null) _defaultTailSprite = _tailImage.sprite;
+        
+        if (_messageText != null)
+        {
+            _defaultTextOffsetMin = _messageText.rectTransform.offsetMin;
+            _defaultTextOffsetMax = _messageText.rectTransform.offsetMax;
+            _defaultFontColor = _messageText.color;
+            _defaultFontSize = _messageText.fontSize;
+        }
+    }
+
     private void Start()
     {
-        // テーマ変更イベントへの登録
         if (ThemeManager.Instance != null)
         {
             ThemeManager.Instance.OnThemeLoaded += ApplyTheme;
-            
-            // ※起動時に既にテーマがロード済みの場合を考慮し、
-            // 現在のテーマを即座に適用する処理をここに挟むのも推奨されます。
         }
     }
 
     private void OnDestroy()
     {
-        // オブジェクト破棄時のイベント解除とメモリ解放
         if (ThemeManager.Instance != null)
         {
             ThemeManager.Instance.OnThemeLoaded -= ApplyTheme;
@@ -36,83 +54,76 @@ public class DialogueWindowUI : MonoBehaviour
         CleanupDynamicAssets();
     }
 
-    /// <summary>
-    /// テーマデータを受信してUIに適用します。
-    /// </summary>
     private void ApplyTheme(ThemeSettings theme, string dirPath)
     {
         var settings = theme.dialogueWindow;
         if (settings == null) return;
 
-        // 古いテクスチャ/スプライトがメモリに残るのを防ぐ
-        CleanupDynamicAssets();
+        CleanupDynamicAssets(); // 以前の動的生成画像をメモリから消去
 
-        // 1. 背景画像のロードと9スライス適用
-        if (!string.IsNullOrEmpty(settings.backgroundImage))
+        // 1. 背景画像の適用とフォールバック
+        string bgPath = !string.IsNullOrEmpty(settings.backgroundImage) ? Path.Combine(dirPath, settings.backgroundImage) : null;
+        if (bgPath != null && File.Exists(bgPath))
         {
-            string bgPath = Path.Combine(dirPath, settings.backgroundImage);
             Texture2D bgTex = TextureLoader.LoadFromFile(bgPath);
-            if (bgTex != null)
-            {
-                _dynamicBgSprite = SpriteFactory.Create9SliceSprite(bgTex, settings.backgroundBorder);
-                _backgroundImage.sprite = _dynamicBgSprite;
-                _backgroundImage.type = Image.Type.Sliced; // 確実に9スライスを有効化
-            }
+            _dynamicBgSprite = SpriteFactory.Create9SliceSprite(bgTex, settings.backgroundBorder);
+            _backgroundImage.sprite = _dynamicBgSprite;
+            _backgroundImage.type = Image.Type.Sliced;
+        }
+        else
+        {
+            _backgroundImage.sprite = _defaultBgSprite;
+            _backgroundImage.type = Image.Type.Sliced;
         }
 
-        // 2. しっぽ画像のロード
-        if (!string.IsNullOrEmpty(settings.tailImage))
+        // 2. しっぽ画像の適用とフォールバック
+        string tailPath = !string.IsNullOrEmpty(settings.tailImage) ? Path.Combine(dirPath, settings.tailImage) : null;
+        if (tailPath != null && File.Exists(tailPath))
         {
-            string tailPath = Path.Combine(dirPath, settings.tailImage);
             Texture2D tailTex = TextureLoader.LoadFromFile(tailPath);
-            if (tailTex != null)
-            {
-                // しっぽには9スライス不要なためボーダー設定はnullで生成
-                _dynamicTailSprite = SpriteFactory.Create9SliceSprite(tailTex, null);
-                _tailImage.sprite = _dynamicTailSprite;
-                _tailImage.type = Image.Type.Simple;
-                _tailImage.SetNativeSize(); // 画像本来のサイズにリセット
-            }
+            _dynamicTailSprite = SpriteFactory.Create9SliceSprite(tailTex, null);
+            _tailImage.sprite = _dynamicTailSprite;
+            _tailImage.type = Image.Type.Simple;
+            _tailImage.SetNativeSize();
         }
-
-        // 3. テキスト領域のパディング適用
-        if (settings.textPadding != null && _messageText != null)
+        else
         {
-            UILayoutUtility.ApplyPadding(_messageText.rectTransform, settings.textPadding);
+            _tailImage.sprite = _defaultTailSprite;
+            _tailImage.type = Image.Type.Simple;
+            _tailImage.SetNativeSize(); // デフォルト画像本来のサイズに戻す
         }
 
-        // 4. フォントスタイルの適用
+        // 3. テキスト領域のパディング適用とフォールバック
         if (_messageText != null)
         {
-            // HTMLカラーコード（"#333333" など）をUnityのColorに変換
-            if (ColorUtility.TryParseHtmlString(settings.fontColorHtml, out Color fontColor))
+            if (settings.textPadding != null)
             {
+                UILayoutUtility.ApplyPadding(_messageText.rectTransform, settings.textPadding);
+            }
+            else
+            {
+                // パディングの指定がない場合は、覚えている初期のRectに戻す
+                _messageText.rectTransform.offsetMin = _defaultTextOffsetMin;
+                _messageText.rectTransform.offsetMax = _defaultTextOffsetMax;
+            }
+
+            // 4. フォントカラーとサイズの適用とフォールバック
+            if (!string.IsNullOrEmpty(settings.fontColorHtml) && ColorUtility.TryParseHtmlString(settings.fontColorHtml, out Color fontColor))
                 _messageText.color = fontColor;
-            }
+            else
+                _messageText.color = _defaultFontColor;
+
             if (settings.fontSize > 0)
-            {
                 _messageText.fontSize = settings.fontSize;
-            }
+            else
+                _messageText.fontSize = _defaultFontSize;
         }
     }
 
-    /// <summary>
-    /// 動的に生成したテクスチャとスプライトを明示的に破棄します。
-    /// </summary>
     private void CleanupDynamicAssets()
     {
-        if (_dynamicBgSprite != null)
-        {
-            if (_dynamicBgSprite.texture != null) Destroy(_dynamicBgSprite.texture);
-            Destroy(_dynamicBgSprite);
-            _dynamicBgSprite = null;
-        }
-
-        if (_dynamicTailSprite != null)
-        {
-            if (_dynamicTailSprite.texture != null) Destroy(_dynamicTailSprite.texture);
-            Destroy(_dynamicTailSprite);
-            _dynamicTailSprite = null;
-        }
+        // _defaultBgSprite 等はUnityの管理下にあるため絶対にDestroyしないこと
+        if (_dynamicBgSprite != null) { if (_dynamicBgSprite.texture != null) Destroy(_dynamicBgSprite.texture); Destroy(_dynamicBgSprite); _dynamicBgSprite = null; }
+        if (_dynamicTailSprite != null) { if (_dynamicTailSprite.texture != null) Destroy(_dynamicTailSprite.texture); Destroy(_dynamicTailSprite); _dynamicTailSprite = null; }
     }
 }

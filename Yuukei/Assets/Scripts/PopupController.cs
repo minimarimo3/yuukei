@@ -25,46 +25,51 @@ public class PopupController : MonoBehaviour
 
     private void Awake()
     {
-        _closeButton.onClick.AddListener(ClosePopup);
+        if (_closeButton != null)
+        {
+            _closeButton.onClick.AddListener(ClosePopup);
+        }
     }
 
-    /// <summary>
-    /// PopupManagerから呼ばれ、テーマと内容を適用します
-    /// </summary>
     public void Setup(PopupThemeSettings theme, string message, string dirPath)
     {
-        _contentText.text = message;
+        if (_contentText != null) _contentText.text = message;
+        if (theme == null) return; // テーマデータが丸ごと無ければプレハブのまま表示
 
-        // 1. 背景画像の適用と描画モードの切り替え
+        // 1. 背景画像の適用 (指定がなければプレハブ画像のまま)
         if (!string.IsNullOrEmpty(theme.backgroundImage))
         {
-            Texture2D bgTex = TextureLoader.LoadFromFile(Path.Combine(dirPath, theme.backgroundImage));
-            if (bgTex != null)
+            string bgPath = Path.Combine(dirPath, theme.backgroundImage);
+            if (File.Exists(bgPath))
             {
-                if (theme.backgroundDrawMode == "Simple")
+                Texture2D bgTex = TextureLoader.LoadFromFile(bgPath);
+                if (bgTex != null)
                 {
-                    _dynamicBgSprite = SpriteFactory.Create9SliceSprite(bgTex, null);
-                    _backgroundImage.sprite = _dynamicBgSprite;
-                    _backgroundImage.type = Image.Type.Simple;
-                    _backgroundImage.preserveAspect = true;
-                    // Nativeサイズに合わせる
-                    _windowRect.sizeDelta = new Vector2(bgTex.width, bgTex.height);
-                }
-                else
-                {
-                    _dynamicBgSprite = SpriteFactory.Create9SliceSprite(bgTex, theme.backgroundBorder);
-                    _backgroundImage.sprite = _dynamicBgSprite;
-                    _backgroundImage.type = Image.Type.Sliced;
+                    if (theme.backgroundDrawMode == "Simple")
+                    {
+                        _dynamicBgSprite = SpriteFactory.Create9SliceSprite(bgTex, null);
+                        _backgroundImage.sprite = _dynamicBgSprite;
+                        _backgroundImage.type = Image.Type.Simple;
+                        _backgroundImage.preserveAspect = true;
+                        _windowRect.sizeDelta = new Vector2(bgTex.width, bgTex.height);
+                    }
+                    else
+                    {
+                        _dynamicBgSprite = SpriteFactory.Create9SliceSprite(bgTex, theme.backgroundBorder);
+                        _backgroundImage.sprite = _dynamicBgSprite;
+                        _backgroundImage.type = Image.Type.Sliced;
+                    }
                 }
             }
         }
 
-        // 2. アイコンの設定（InfoやErrorなど）
-        if (_iconImage != null)
+        // 2. アイコンの設定
+        if (_iconImage != null && !string.IsNullOrEmpty(theme.iconImage))
         {
-            if (!string.IsNullOrEmpty(theme.iconImage))
+            string iconPath = Path.Combine(dirPath, theme.iconImage);
+            if (File.Exists(iconPath))
             {
-                Texture2D iconTex = TextureLoader.LoadFromFile(Path.Combine(dirPath, theme.iconImage));
+                Texture2D iconTex = TextureLoader.LoadFromFile(iconPath);
                 if (iconTex != null)
                 {
                     _dynamicIconSprite = SpriteFactory.Create9SliceSprite(iconTex, null);
@@ -72,20 +77,24 @@ public class PopupController : MonoBehaviour
                     _iconImage.gameObject.SetActive(true);
                 }
             }
-            else
-            {
-                _iconImage.gameObject.SetActive(false);
-            }
+        }
+        // JSONでアイコン名が明示的に空文字指定されている場合は非表示にする
+        else if (theme.iconImage == "") 
+        {
+            if (_iconImage != null) _iconImage.gameObject.SetActive(false);
         }
 
         // 3. パディングとフォントカラーの適用
-        if (theme.contentPadding != null)
+        if (theme.contentPadding != null && _contentText != null)
         {
             UILayoutUtility.ApplyPadding(_contentText.rectTransform, theme.contentPadding);
         }
-        if (ColorUtility.TryParseHtmlString(theme.fontColorHtml, out Color fontColor))
+        if (!string.IsNullOrEmpty(theme.fontColorHtml) && _contentText != null)
         {
-            _contentText.color = fontColor;
+            if (ColorUtility.TryParseHtmlString(theme.fontColorHtml, out Color fontColor))
+            {
+                _contentText.color = fontColor;
+            }
         }
 
         // 4. 閉じるボタンの設定
@@ -97,38 +106,49 @@ public class PopupController : MonoBehaviour
 
     private void SetupCloseButton(CloseButtonSettings btnSettings, string dirPath)
     {
-        // TransitionをSpriteSwapに強制
         _closeButton.transition = Selectable.Transition.SpriteSwap;
 
-        // Normal画像 (Imageコンポーネント自体のSpriteに設定)
+        // Normal画像
         if (!string.IsNullOrEmpty(btnSettings.normalImage))
         {
-            Texture2D tex = TextureLoader.LoadFromFile(Path.Combine(dirPath, btnSettings.normalImage));
-            if (tex != null)
+            string path = Path.Combine(dirPath, btnSettings.normalImage);
+            if (File.Exists(path))
             {
-                _closeNormalSprite = SpriteFactory.Create9SliceSprite(tex, null);
-                _closeButtonImage.sprite = _closeNormalSprite;
+                Texture2D tex = TextureLoader.LoadFromFile(path);
+                if (tex != null)
+                {
+                    _closeNormalSprite = SpriteFactory.Create9SliceSprite(tex, null);
+                    _closeButtonImage.sprite = _closeNormalSprite;
+                }
             }
         }
 
-        // Hover / Pressed 画像 (SpriteStateに設定してButtonに渡す)
-        SpriteState spriteState = new SpriteState();
+        // Hover / Pressed 画像
+        SpriteState spriteState = _closeButton.spriteState; // 現在の状態（プレハブの状態）をベースにする
         if (!string.IsNullOrEmpty(btnSettings.hoverImage))
         {
-            Texture2D tex = TextureLoader.LoadFromFile(Path.Combine(dirPath, btnSettings.hoverImage));
-            if (tex != null) _closeHoverSprite = SpriteFactory.Create9SliceSprite(tex, null);
-            spriteState.highlightedSprite = _closeHoverSprite;
+            string path = Path.Combine(dirPath, btnSettings.hoverImage);
+            if (File.Exists(path))
+            {
+                Texture2D tex = TextureLoader.LoadFromFile(path);
+                if (tex != null) _closeHoverSprite = SpriteFactory.Create9SliceSprite(tex, null);
+                spriteState.highlightedSprite = _closeHoverSprite;
+            }
         }
         if (!string.IsNullOrEmpty(btnSettings.pressedImage))
         {
-            Texture2D tex = TextureLoader.LoadFromFile(Path.Combine(dirPath, btnSettings.pressedImage));
-            if (tex != null) _closePressedSprite = SpriteFactory.Create9SliceSprite(tex, null);
-            spriteState.pressedSprite = _closePressedSprite;
+            string path = Path.Combine(dirPath, btnSettings.pressedImage);
+            if (File.Exists(path))
+            {
+                Texture2D tex = TextureLoader.LoadFromFile(path);
+                if (tex != null) _closePressedSprite = SpriteFactory.Create9SliceSprite(tex, null);
+                spriteState.pressedSprite = _closePressedSprite;
+            }
         }
         _closeButton.spriteState = spriteState;
 
-        // サイズと位置の適用 (右上Anchor)
-        if (btnSettings.size != null)
+        // サイズと位置の適用
+        if (btnSettings.size != null && btnSettings.size.width > 0)
             _closeButtonRect.sizeDelta = new Vector2(btnSettings.size.width, btnSettings.size.height);
 
         _closeButtonRect.anchorMin = new Vector2(1, 1);
@@ -141,13 +161,11 @@ public class PopupController : MonoBehaviour
 
     private void ClosePopup()
     {
-        // 将来的にフェードアウトなどのアニメーションを挟む場合はここを改修します
         Destroy(gameObject);
     }
 
     private void OnDestroy()
     {
-        // ガベージコレクションに頼らず、アンマネージドなテクスチャメモリを確実に解放
         if (_dynamicBgSprite != null) { if (_dynamicBgSprite.texture != null) Destroy(_dynamicBgSprite.texture); Destroy(_dynamicBgSprite); }
         if (_dynamicIconSprite != null) { if (_dynamicIconSprite.texture != null) Destroy(_dynamicIconSprite.texture); Destroy(_dynamicIconSprite); }
         if (_closeNormalSprite != null) { if (_closeNormalSprite.texture != null) Destroy(_closeNormalSprite.texture); Destroy(_closeNormalSprite); }
