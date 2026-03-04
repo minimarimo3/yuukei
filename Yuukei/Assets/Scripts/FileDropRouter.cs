@@ -42,6 +42,11 @@ public class FileDropRouter : MonoBehaviour
                     // 必要であれば、ここでドロップされたキャラを即座に「選択」状態にする処理を呼ぶ
                     break;
 
+                case ".zip":
+                    Debug.Log($"テーマファイル(ZIP)がドロップされました: {path}");
+                    ThemeManager.Instance.LoadThemeFromZip(path);
+                    break;
+
                 case ".txt":
                 case ".json":
                     // TODO: 台本マネージャー等へルーティング
