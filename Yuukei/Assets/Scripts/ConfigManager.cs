@@ -24,6 +24,12 @@ public class ConfigManager : MonoBehaviour
 {
     public static ConfigManager Instance { get; private set; }
 
+    /// <summary>設定の初回ロードが完了した際に呼ばれる</summary>
+    public event Action OnConfigLoaded;
+    
+    /// <summary>キャラクターが変更された際に呼ばれる (引数は新しいCharacterId)</summary>
+    public event Action<string> OnCharacterChanged;
+
     public AppSettings Settings { get; private set; }
     private string _savePath;
 
@@ -62,6 +68,7 @@ public class ConfigManager : MonoBehaviour
         {
             Settings = new AppSettings();
         }
+        OnConfigLoaded?.Invoke();
     }
 
     public void SaveSettings()
@@ -91,11 +98,18 @@ public class ConfigManager : MonoBehaviour
         SaveSettings();
     }
 
-    public void SetCurrentCharacter(string id)
+    /// <summary>
+    /// UI等から現在のキャラクターを変更する際に呼び出すメソッド
+    /// </summary>
+    public void SetCurrentCharacter(string characterId)
     {
-        Settings.currentCharacterId = id;
+        if (Settings.currentCharacterId == characterId) return;
+
+        Settings.currentCharacterId = characterId;
         SaveSettings();
-        // TODO: ここで実際のキャラクターモデルをロード・切り替えるイベントを発火する
-        Debug.Log($"キャラクターを切り替えました。ID: {id}");
+        
+        // 変更イベントを発火
+        OnCharacterChanged?.Invoke(characterId);
     }
+
 }

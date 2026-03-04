@@ -48,8 +48,9 @@ public class SettingsUIManager : MonoBehaviour
         _activePageContent = root.Q<ScrollView>("ActivePageContent");
         _placeholderText = root.Q<Label>("PlaceholderText");
 
-        _closeButton.clicked += HideSettings;
-        _dragManipulator = new PanelDragManipulator(_dragHandle, _settingsPanel);
+        if (_closeButton != null) _closeButton.clicked += HideSettings;
+        if (_dragHandle != null && _settingsPanel != null)
+            _dragManipulator = new PanelDragManipulator(_dragHandle, _settingsPanel);
 
         // タブボタンのイベント登録
         foreach (var kvp in _tabTitleMap)
@@ -85,6 +86,7 @@ public class SettingsUIManager : MonoBehaviour
 
     public void ShowSettings()
     {
+        if (_rootContainer == null) return;
         _rootContainer.style.display = DisplayStyle.Flex;
         if (!_isPositionInitialized) {
             _settingsPanel.RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
@@ -95,6 +97,7 @@ public class SettingsUIManager : MonoBehaviour
 
     public void HideSettings()
     {
+        if (_rootContainer == null) return;
         _rootContainer.style.display = DisplayStyle.None;
     }
 
