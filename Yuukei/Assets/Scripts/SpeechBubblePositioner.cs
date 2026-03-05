@@ -33,6 +33,15 @@ public class SpeechBubblePositioner : MonoBehaviour
     [SerializeField, Tooltip("画面端からの余白（パディング）")]
     private Vector2 screenPadding = new Vector2(20f, 20f);
 
+    [Header("UI References (Optional)")]
+    [SerializeField, Tooltip("背景のRectTransform (自動で子から検索します)")]
+    private RectTransform backgroundRect;
+
+    [SerializeField, Tooltip("しっぽのRectTransform (自動で子から検索します)")]
+    private RectTransform tailRect;
+
+    private float _initialTailLocalX;
+
     private Transform _headBone;
     private Vrm10Instance _lastInstance;
     private Canvas _parentCanvas;
@@ -52,6 +61,26 @@ public class SpeechBubblePositioner : MonoBehaviour
         if (canvasRect != null)
         {
             _parentCanvas = canvasRect.GetComponentInParent<Canvas>();
+        }
+
+        if (backgroundRect == null && targetBubble != null)
+        {
+            var bg = targetBubble.Find("Background");
+            if (bg != null) backgroundRect = bg.GetComponent<RectTransform>();
+        }
+
+        if (tailRect == null && targetBubble != null)
+        {
+            var tail = targetBubble.Find("Tail");
+            if (tail != null) 
+            {
+                tailRect = tail.GetComponent<RectTransform>();
+                _initialTailLocalX = tailRect.localPosition.x;
+            }
+        }
+        else if (tailRect != null)
+        {
+            _initialTailLocalX = tailRect.localPosition.x;
         }
     }
 
@@ -100,6 +129,8 @@ public class SpeechBubblePositioner : MonoBehaviour
         // 2. スクリーン座標を Canvas内 (canvasRect) のローカル座標に変換
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, eventCamera, out Vector2 localPoint))
         {
+            Vector2 originalLocalPoint = localPoint;
+
             // 3. UIが画面外に出ないようにクランプ (Clamping)
             if (enableClamping)
             {
@@ -108,6 +139,26 @@ public class SpeechBubblePositioner : MonoBehaviour
 
             // 4. 座標を適用
             targetBubble.localPosition = localPoint;
+
+            // 5. しっぽの位置補正 (端に寄ったときにしっぽがキャラを指し示すように逆方向へシフト)
+            if (tailRect != null)
+            {
+                float shiftX = localPoint.x - originalLocalPoint.x;
+                float targetTailX = _initialTailLocalX - shiftX; // 逆方向に動かす
+                
+                if (backgroundRect != null)
+                {
+                    float halfBgW = backgroundRect.rect.width * 0.5f;
+                    float halfTailW = tailRect.rect.width * 0.5f;
+                    float maxOffset = Mathf.Max(0, halfBgW - halfTailW - 10f); // margin
+                    targetTailX = Mathf.Clamp(targetTailX, -maxOffset, maxOffset);
+                }
+
+                if (Mathf.Abs(tailRect.localPosition.x - targetTailX) > 0.01f)
+                {
+                    tailRect.localPosition = new Vector3(targetTailX, tailRect.localPosition.y, tailRect.localPosition.z);
+                }
+            }
         }
     }
 
@@ -119,8 +170,8 @@ public class SpeechBubblePositioner : MonoBehaviour
         // 制限領域 (コンテナ) のサイズ情報
         Rect cRect = canvasRect.rect;
         
-        // 吹き出し自身のサイズとピボット情報
-        Rect bRect = targetBubble.rect;
+        // 吹き出しの実質的なサイズ（Backgroundがあればそちらを優先）
+        Rect bRect = (backgroundRect != null) ? backgroundRect.rect : targetBubble.rect;
         Vector2 pivot = targetBubble.pivot;
 
         // はみ出さないための限界座標（Min / Max）をピボットと「スケール(localScale)」を考慮して計算
