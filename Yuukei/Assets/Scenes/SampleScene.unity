@@ -815,6 +815,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &678740290
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 678740291}
+  - component: {fileID: 678740292}
+  m_Layer: 0
+  m_Name: LipSync
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &678740291
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678740290}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1891204471}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &678740292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 678740290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e63114567b9b54a8b5963701c1e268, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRMLipSync
+  characterManager: {fileID: 150446865}
+  _secondsPerChar: 0.08
+  _lerpSpeed: 20
+  _maxWeight: 1
 --- !u!1001 &708914355
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1964,7 +2012,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1891204471}
   m_Layer: 0
-  m_Name: VRM Preloader
+  m_Name: VRM
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1984,6 +2032,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 708914356}
+  - {fileID: 678740291}
   m_Father: {fileID: 1995541652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1964602097 stripped
@@ -2093,7 +2142,7 @@ MonoBehaviour:
     \u540D\u524D\u3092\u6559\u3048\u3066\u3082\u3089\u3063\u305F=\u306F\u3044\r\n\u304A\u308F\u308A\r\n\r\n\u203B\uFF08\u540D\u524D\u3092\u6559\u3048\u3066\u3082\u3089\u3063\u305F\uFF09:\r\n   
     \u300C\u6539\u3081\u3066\u3001\u3088\u308D\u3057\u304F\u306D\uFF01\uFF1C\u30E6\u30FC\u30B6\u30FC\u540D\uFF1E\u3055\u3093\uFF01\u300D\r\n\u304A\u308F\u308A"
   _dialogueWaitSeconds: 1.5
-  _lipSync: {fileID: 0}
+  _lipSync: {fileID: 678740292}
 --- !u!1 &2025645563
 GameObject:
   m_ObjectHideFlags: 0
