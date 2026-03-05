@@ -26,6 +26,10 @@ namespace Daihon.Samples
         [SerializeField]
         private float _dialogueWaitSeconds = 1.5f;
 
+        [Header("口パク")]
+        [SerializeField, Tooltip("VRM 口パクコンポーネント（任意）")]
+        private VRMLipSync _lipSync;
+
         private void Start()
         {
             RunSampleAsync().Forget();
@@ -45,16 +49,25 @@ namespace Daihon.Samples
         // IUniTaskActionHandler の実装
         // ================================================================
 
-        /// <summary>セリフを表示し、指定秒数待機する。</summary>
+        /// <summary>セリフを表示し、口パク再生（または待機）する。</summary>
         public async UniTask ShowDialogueAsync(string text)
         {
             Debug.Log($"<color=yellow>[セリフ]</color> {text}");
 
-            // 実際のプロジェクトでは、ここで UI テキストの文字送り +
-            // クリック待ちなどを実装します。
-            await UniTask.Delay(
-                System.TimeSpan.FromSeconds(_dialogueWaitSeconds),
-                cancellationToken: this.GetCancellationTokenOnDestroy());
+            var ct = this.GetCancellationTokenOnDestroy();
+
+            if (_lipSync != null)
+            {
+                // 口パクでセリフを再生（テキスト長に応じた自然な待機）
+                await _lipSync.SpeakAsync(text, ct);
+            }
+            else
+            {
+                // 口パク未設定時は従来どおり固定秒数だけ待機
+                await UniTask.Delay(
+                    System.TimeSpan.FromSeconds(_dialogueWaitSeconds),
+                    cancellationToken: ct);
+            }
         }
 
         /// <summary>関数呼び出しをログ出力する。</summary>

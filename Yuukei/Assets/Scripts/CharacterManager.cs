@@ -18,6 +18,9 @@ public class CharacterManager : MonoBehaviour
     // 現在ロードされているVRMのインスタンス
     private Vrm10Instance _currentVrmInstance;
 
+    /// <summary>現在ロードされているVRMインスタンスへの外部参照</summary>
+    public Vrm10Instance CurrentVrmInstance => _currentVrmInstance;
+
     private void Start()
     {
         if (configManager != null)
