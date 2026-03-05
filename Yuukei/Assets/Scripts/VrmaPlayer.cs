@@ -57,11 +57,9 @@ public class VrmaPlayer : MonoBehaviour
         currentVrm.transform.localRotation = Quaternion.identity;
         
         // 【重要】アニメーションソースはVRMの「兄弟オブジェクト」として配置する
-        // VRMの子にしてしまうとリターゲティング時の移動計算がループしてテレポートする原因になります。
         _playingInstance.transform.SetParent(currentVrm.transform.parent, false);
         _playingInstance.transform.localPosition = currentVrm.transform.localPosition;
         _playingInstance.transform.localRotation = currentVrm.transform.localRotation;
-        _playingInstance.transform.localScale = Vector3.one;
 
         if (_playingInstance.ControlRig.Item1 == null || _playingInstance.ControlRig.Item2 == null)
         {

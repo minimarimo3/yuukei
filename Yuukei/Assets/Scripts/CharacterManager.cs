@@ -133,10 +133,6 @@ public class CharacterManager : MonoBehaviour
                 // VRMの全Rendererに対してアウトライン用のRendering Layerを付与する
                 ApplyOutlineRenderingLayer(_currentVrmInstance.gameObject);
 
-                // スケールを変更する前にRuntimeを呼び出すことでAvatarBuilderが呼び出される
-                //  スケールを変更してからvrmaの適用等で呼び出すとヌルポでクラッシュする
-                var forceInit = _currentVrmInstance.Runtime;
-
                 // デフォルトのscaleだと小さいので適当に大きくする(2.3)
                 _currentVrmInstance.transform.localScale = new Vector3(2.3f, 2.3f, 2.3f);
 
