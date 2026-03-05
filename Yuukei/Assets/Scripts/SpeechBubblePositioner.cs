@@ -26,7 +26,13 @@ public class SpeechBubblePositioner : MonoBehaviour
     [SerializeField, Tooltip("スクリーン座標上での追加オフセット")]
     private Vector2 screenOffset = new Vector2(0f, 0f);
 
-    [Header("Clamping Settings")]
+    [Header("Clamping & Avoidance Settings")]
+    [SerializeField, Tooltip("キャラクターと被らないように左右に自動配置（回避）するかどうか")]
+    private bool avoidCharacter = true;
+
+    [SerializeField, Tooltip("キャラクターの頭部から左右に離す距離（マージン）")]
+    private float characterMarginX = 160f;
+
     [SerializeField, Tooltip("画面端（canvasRect内）に収まるように制限するかどうか")]
     private bool enableClamping = true;
 
@@ -39,6 +45,13 @@ public class SpeechBubblePositioner : MonoBehaviour
 
     [SerializeField, Tooltip("しっぽのRectTransform (自動で子から検索します)")]
     private RectTransform tailRect;
+
+    [Header("Tail Settings")]
+    [SerializeField, Tooltip("しっぽの向きをキャラクターの方向へ自動で反転（Scale Xの反転）させるかどうか")]
+    private bool autoFlipTail = true;
+
+    [SerializeField, Tooltip("元のしっぽの画像が『右向き』の場合はチェック（通常『左向き』想定ならオフ）")]
+    private bool isTailOriginallyFacingRight = false;
 
     private float _initialTailLocalX;
 
@@ -131,16 +144,22 @@ public class SpeechBubblePositioner : MonoBehaviour
         {
             Vector2 originalLocalPoint = localPoint;
 
-            // 3. UIが画面外に出ないようにクランプ (Clamping)
+            // 3. キャラ被りを回避するため、左右どちらかにシフト
+            if (avoidCharacter)
+            {
+                AvoidCharacterHorizontal(ref localPoint, originalLocalPoint);
+            }
+
+            // 4. UIが画面外に出ないようにクランプ (Clamping)
             if (enableClamping)
             {
                 ClampToCanvas(ref localPoint);
             }
 
-            // 4. 座標を適用
+            // 5. 座標を適用
             targetBubble.localPosition = localPoint;
 
-            // 5. しっぽの位置補正 (端に寄ったときにしっぽがキャラを指し示すように逆方向へシフト)
+            // 6. しっぽの位置補正 (端に寄ったときにしっぽがキャラを指し示すように逆方向へシフト)
             if (tailRect != null)
             {
                 float shiftX = localPoint.x - originalLocalPoint.x;
@@ -157,6 +176,28 @@ public class SpeechBubblePositioner : MonoBehaviour
                 if (Mathf.Abs(tailRect.localPosition.x - targetTailX) > 0.01f)
                 {
                     tailRect.localPosition = new Vector3(targetTailX, tailRect.localPosition.y, tailRect.localPosition.z);
+                }
+
+                // しっぽの向きをキャラクターの方へ自動で向ける (Scale.x の反転)
+                if (autoFlipTail)
+                {
+                    // shiftX > 0 => 吹き出しは右側、キャラは左側 => しっぽは左を向くべき
+                    // shiftX < 0 => 吹き出しは左側、キャラは右側 => しっぽは右を向くべき
+                    float currentDirection = shiftX >= 0 ? 1f : -1f; // 1:左向き、-1:右向き (標準を左向きとした場合)
+                    
+                    if (isTailOriginallyFacingRight)
+                    {
+                        currentDirection *= -1f;
+                    }
+
+                    Vector3 tailScale = tailRect.localScale;
+                    float targetScaleX = Mathf.Abs(tailScale.x) * currentDirection;
+                    
+                    if (Mathf.Abs(tailScale.x - targetScaleX) > 0.001f)
+                    {
+                        tailScale.x = targetScaleX;
+                        tailRect.localScale = tailScale;
+                    }
                 }
             }
         }
@@ -201,5 +242,52 @@ public class SpeechBubblePositioner : MonoBehaviour
         // Clamp
         localPoint.x = Mathf.Clamp(localPoint.x, minX, maxX);
         localPoint.y = Mathf.Clamp(localPoint.y, minY, maxY);
+    }
+
+    /// <summary>
+    /// キャラクター（頭部）と吹き出し本体が被らないように、左右へオフセットさせます。
+    /// 右側に余裕があれば右、なければ左、どちらも厳しければ広い方へ配置します。
+    /// </summary>
+    private void AvoidCharacterHorizontal(ref Vector2 localPoint, Vector2 headPos)
+    {
+        Rect cRect = canvasRect.rect;
+        Rect bRect = (backgroundRect != null) ? backgroundRect.rect : targetBubble.rect;
+        Vector2 pivot = targetBubble.pivot;
+
+        float scaledWidth = bRect.width * targetBubble.localScale.x;
+
+        // 右側・左側それぞれのターゲットX座標
+        float rightTargetX = headPos.x + (scaledWidth * pivot.x) + characterMarginX;
+        float leftTargetX = headPos.x - (scaledWidth * (1f - pivot.x)) - characterMarginX;
+
+        // 画面内に収めるための限界X座標
+        float minX = cRect.min.x + (scaledWidth * pivot.x) + screenPadding.x;
+        float maxX = cRect.max.x - (scaledWidth * (1f - pivot.x)) - screenPadding.x;
+
+        if (rightTargetX <= maxX)
+        {
+            // 右側に収まる
+            localPoint.x = rightTargetX;
+        }
+        else if (leftTargetX >= minX)
+        {
+            // 左側に収まる
+            localPoint.x = leftTargetX;
+        }
+        else
+        {
+            // どちらも収まらない（画面幅が狭い、または吹き出しが大きい）場合
+            // スペースが広い側に配置する
+            float rightSpace = cRect.max.x - headPos.x;
+            float leftSpace = headPos.x - cRect.min.x;
+            if (rightSpace >= leftSpace)
+            {
+                localPoint.x = rightTargetX;
+            }
+            else
+            {
+                localPoint.x = leftTargetX;
+            }
+        }
     }
 }
