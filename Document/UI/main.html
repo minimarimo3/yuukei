@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Mascot UI Material Exporter (for uGUI)</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <link rel="stylesheet" href="base.css">
+  
+  <link id="active-theme-stylesheet" rel="stylesheet" href="">
+</head>
+<body>
+
+  <div class="toolbar">
+    <div class="toolbar-row">
+      <label for="theme-selector"><strong>UIテーマ:</strong></label>
+      <select id="theme-selector">
+        <option value="">読込中...</option>
+      </select>
+      <button id="btn-download-all" class="dl-all-btn">📦 全パーツを一括ZIP保存</button>
+    </div>
+    <div class="toolbar-row">
+      <label>
+        <input type="checkbox" id="toggle-capture-mode">
+        <span>文字隠しモード（※ONにしてから一括保存すると、文字なしの綺麗な画像群がZIP化されます）</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="catalog-section">
+    <h2>1. セリフ枠</h2>
+    <div class="component-grid">
+      <div class="catalog-item">
+        <span class="label">背景ベース (128x128)</span>
+        <div id="speech_base" class="speech-bubble-base bg-pattern capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('speech_base')">↓ PNG保存</button>
+      </div>
+      <div class="catalog-item">
+        <span class="label">しっぽパーツ</span>
+        <div id="speech_tail" class="speech-bubble-tail capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('speech_tail')">↓ PNG保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="catalog-section">
+    <h2>2. ボタン</h2>
+    <div class="component-grid">
+      <div class="catalog-item">
+        <span class="label">通常</span>
+        <div id="btn_normal" class="moe-btn-part border-outset capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('btn_normal')">↓ PNG保存</button>
+      </div>
+      <div class="catalog-item">
+        <span class="label">ホバー</span>
+        <div id="btn_hover" class="moe-btn-part border-outset is-hover capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('btn_hover')">↓ PNG保存</button>
+      </div>
+      <div class="catalog-item">
+        <span class="label">押し下げ</span>
+        <div id="btn_active" class="moe-btn-part border-inset is-active capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('btn_active')">↓ PNG保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="catalog-section">
+    <h2>3. プログレスバー</h2>
+    <div class="component-grid">
+      <div class="catalog-item">
+        <span class="label">背景</span>
+        <div id="progress_bg" class="progress-bg-part border-inset capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('progress_bg')">↓ PNG保存</button>
+      </div>
+      <div class="catalog-item">
+        <span class="label">中身/Fill</span>
+        <div id="progress_fill" class="progress-fill-part capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('progress_fill')">↓ PNG保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="catalog-section">
+    <h2>4. テキスト入力欄</h2>
+    <div class="component-grid">
+      <div class="catalog-item">
+        <span class="label">背景</span>
+        <div id="input_bg" class="moe-input-part border-inset capture-target"></div>
+        <button class="dl-btn" onclick="exportSingleImage('input_bg')">↓ PNG保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="catalog-section">
+    <h2>5. ポップアップ</h2>
+    <div class="component-grid">
+      <div class="catalog-item">
+        <span class="label">汎用ウィンドウ</span>
+        <div id="window_general" class="moe-window border-outset theme-default capture-target">
+          <div class="title-bar">
+            <span class="hide-on-capture"><span class="title-icon hide-icon-on-capture">💠</span>A N G E L  Z O N E</span>
+            <div class="close-btn border-outset"><span class="hide-on-capture">X</span></div>
+          </div>
+          <div class="content-empty bg-pattern"></div>
+        </div>
+        <button class="dl-btn" onclick="exportSingleImage('window_general')">↓ PNG保存</button>
+      </div>
+
+      <div class="catalog-item">
+        <span class="label">Infoウィンドウ</span>
+        <div id="window_info" class="moe-window border-outset theme-info capture-target">
+          <div class="title-bar">
+            <span class="hide-on-capture"><span class="title-icon hide-icon-on-capture">ℹ️</span>BLESSING INFO</span>
+            <div class="close-btn border-outset"><span class="hide-on-capture">X</span></div>
+          </div>
+          <div class="content-empty bg-pattern"></div>
+        </div>
+        <button class="dl-btn" onclick="exportSingleImage('window_info')">↓ PNG保存</button>
+      </div>
+
+      <div class="catalog-item">
+        <span class="label">Warningウィンドウ</span>
+        <div id="window_warn" class="moe-window border-outset theme-warn capture-target">
+          <div class="title-bar">
+            <span class="hide-on-capture"><span class="title-icon hide-icon-on-capture">⚠️</span>CAUTION</span>
+            <div class="close-btn border-outset"><span class="hide-on-capture">X</span></div>
+          </div>
+          <div class="content-empty bg-pattern"></div>
+        </div>
+        <button class="dl-btn" onclick="exportSingleImage('window_warn')">↓ PNG保存</button>
+      </div>
+
+      <div class="catalog-item">
+        <span class="label">Errorウィンドウ</span>
+        <div id="window_error" class="moe-window border-outset theme-error capture-target">
+          <div class="title-bar">
+            <span class="hide-on-capture"><span class="title-icon hide-icon-on-capture">❌</span>DIVINE ERROR</span>
+            <div class="close-btn border-outset"><span class="hide-on-capture">X</span></div>
+          </div>
+          <div class="content-empty bg-pattern"></div>
+        </div>
+        <button class="dl-btn" onclick="exportSingleImage('window_error')">↓ PNG保存</button>
+      </div>
+
+      <div class="catalog-item">
+        <span class="label">バグ・グリッチウィンドウ</span>
+        <div id="window_glitch" class="moe-window border-outset theme-glitch capture-target">
+          <div class="title-bar">
+            <span class="hide-on-capture"><span class="title-icon hide-icon-on-capture">👾</span>h&2*! A N O M A L Y</span>
+            <div class="close-btn border-outset"><span class="hide-on-capture">X</span></div>
+          </div>
+          <div class="content-pattern hide-on-capture">
+            0x00000000<br>prayer_failed...<br>anomaly_#%&
+          </div>
+        </div>
+        <button class="dl-btn" onclick="exportSingleImage('window_glitch')">↓ PNG保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. JSONからのテーマ動的読み込み
+    // ==========================================
+    async function initThemes() {
+      try {
+        const response = await fetch('themes.json');
+        if (!response.ok) throw new Error('themes.json の読み込みに失敗しました');
+        
+        const themes = await response.json();
+        const selector = document.getElementById('theme-selector');
+        
+        // セレクトボックスの構築
+        selector.innerHTML = ''; // 初期メッセージをクリア
+        themes.forEach(theme => {
+          const option = document.createElement('option');
+          option.value = theme.file;
+          option.textContent = theme.name;
+          selector.appendChild(option);
+        });
+
+        // テーマ切り替え処理
+        selector.addEventListener('change', (e) => {
+          document.getElementById('active-theme-stylesheet').href = e.target.value;
+        });
+
+        // 初期ロード時に最初のテーマを適用
+        if (themes.length > 0) {
+          document.getElementById('active-theme-stylesheet').href = themes[0].file;
+        }
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById('theme-selector').innerHTML = '<option value="">テーマ読み込みエラー</option>';
+      }
+    }
+
+    // 初期化実行
+    initThemes();
+
+    // ==========================================
+    // 2. キャプチャ・エクスポートロジック
+    // ==========================================
+    document.getElementById('toggle-capture-mode').addEventListener('change', function(e) {
+      if (e.target.checked) {
+        document.body.classList.add('capture-mode');
+      } else {
+        document.body.classList.remove('capture-mode');
+      }
+    });
+
+    function exportSingleImage(elementId) {
+      const node = document.getElementById(elementId);
+      htmlToImage.toPng(node, { backgroundColor: null, pixelRatio: 1 })
+      .then(function (dataUrl) {
+        const link = document.createElement('a');
+        link.download = elementId + '.png';
+        link.href = dataUrl;
+        link.click();
+      })
+      .catch(function (error) {
+        console.error('画像の生成に失敗しました!', error);
+        alert('画像の生成に失敗しました。');
+      });
+    }
+
+    document.getElementById('btn-download-all').addEventListener('click', async function() {
+      const btn = this;
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = "⏳ ZIP作成中...";
+
+      try {
+        const zip = new JSZip();
+        const targets = document.querySelectorAll('.capture-target');
+        
+        // セレクトボックスで選択されているファイル名から拡張子を除いたものをプレフィックスにする
+        const themePath = document.getElementById('theme-selector').value;
+        const themeName = themePath.split('/').pop().replace('.css', '') || 'theme';
+
+        const promises = Array.from(targets).map(async (node) => {
+          const dataUrl = await htmlToImage.toPng(node, { backgroundColor: null, pixelRatio: 1 });
+          const base64Data = dataUrl.split(',')[1];
+          zip.file(`${node.id}.png`, base64Data, { base64: true });
+        });
+
+        await Promise.all(promises);
+
+        const content = await zip.generateAsync({ type: "blob" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = `UI_Materials_${themeName}.zip`;
+        link.click();
+
+      } catch (error) {
+        console.error('一括ZIP作成に失敗しました:', error);
+        alert('ZIPの作成中にエラーが発生しました。');
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

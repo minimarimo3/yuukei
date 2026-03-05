@@ -1,0 +1,79 @@
+/* base.css */
+body {
+  background-color: #1e1e1e; 
+  color: #ffffff;
+  font-family: 'MS PGothic', 'ＭＳ Ｐゴシック', sans-serif;
+  padding: 40px;
+  margin: 0;
+}
+
+/* Toolbar & Layout */
+.toolbar { background-color: #333; padding: 15px; margin-bottom: 30px; border-radius: 5px; border: 1px solid #555; display: flex; flex-direction: column; gap: 15px; }
+.toolbar-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.toolbar label { font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+select#theme-selector { padding: 5px; font-size: 14px; background-color: #222; color: #fff; border: 1px solid #7fe6ff; border-radius: 3px; }
+.dl-all-btn { padding: 8px 16px; background-color: #2196F3; color: white; border: none; border-radius: 3px; font-size: 14px; font-weight: bold; cursor: pointer; }
+.dl-all-btn:hover { background-color: #1976D2; }
+.dl-all-btn:disabled { background-color: #555; cursor: not-allowed; }
+.catalog-section { margin-bottom: 50px; padding-bottom: 20px; border-bottom: 1px solid #444; }
+.catalog-section h2 { color: #aaaaaa; font-size: 16px; margin-bottom: 20px; }
+.component-grid { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-end; }
+.catalog-item { display: flex; flex-direction: column; gap: 8px; }
+.label { font-size: 12px; font-weight: bold; color: #888888; }
+.dl-btn { padding: 4px 8px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; font-size: 11px; cursor: pointer; width: fit-content; }
+.dl-btn:hover { background-color: #45a049; }
+
+/* Capture Mode Modifiers */
+body.capture-mode .hide-on-capture { color: transparent !important; text-shadow: none !important; }
+body.capture-mode .hide-icon-on-capture { opacity: 0 !important; }
+
+/* Utilities */
+.border-outset { border-top: 3px solid var(--hi); border-left: 3px solid var(--hi); border-right: 3px solid var(--lo); border-bottom: 3px solid var(--lo); box-sizing: border-box; }
+.border-inset { border-top: 3px solid var(--lo); border-left: 3px solid var(--lo); border-right: 3px solid var(--hi); border-bottom: 3px solid var(--hi); box-sizing: border-box; }
+.bg-pattern {
+  background-image:
+    radial-gradient(var(--shadow) 18%, transparent 19%),
+    linear-gradient(0deg, rgba(255,255,255,0.0), var(--shadow));
+  background-size: 16px 16px, 100% 100%;
+}
+
+/* Components */
+.speech-bubble-base { background-color: var(--win-bg); border: 2px dotted var(--dot); width: 128px; height: 128px; box-sizing: border-box; }
+.speech-bubble-tail { position: relative; width: 18px; height: 18px; }
+.speech-bubble-tail::before { content: ''; position: absolute; top: 0; left: 0; border-width: 18px 18px 0 0; border-style: solid; border-color: var(--dot) transparent transparent transparent; }
+.speech-bubble-tail::after { content: ''; position: absolute; top: 0; left: 2px; border-width: 15px 15px 0 0; border-style: solid; border-color: var(--win-bg) transparent transparent transparent; }
+
+.moe-btn-part { background-color: var(--btn-bg); width: 120px; height: 32px; box-sizing: border-box; }
+.moe-btn-part.is-hover { background-color: var(--btn-hover); }
+.moe-btn-part.is-active { background-color: var(--btn-active); }
+
+.progress-bg-part { width: 200px; height: 26px; background-color: #001a22; box-sizing: border-box; }
+.progress-fill-part { width: 194px; height: 20px; background: linear-gradient(90deg, var(--title-a), var(--title-b)); box-sizing: border-box; }
+
+.moe-input-part { background-color: #ffffff; width: 250px; height: 30px; box-sizing: border-box; background-image: repeating-linear-gradient(transparent, transparent 2px, var(--shadow) 3px, var(--shadow) 3px); }
+
+.moe-window { width: 300px; background-color: var(--win-bg); padding: 3px; box-shadow: 0 0 15px var(--shadow); position: relative; overflow: hidden; }
+.moe-window::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.9) 0 1px, transparent 2px) 20% 30%/140px 140px,
+    radial-gradient(circle, rgba(255,255,255,0.8) 0 1px, transparent 2px) 70% 25%/160px 160px,
+    radial-gradient(circle, rgba(255,255,255,0.7) 0 1px, transparent 2px) 55% 80%/190px 190px;
+}
+.title-bar { padding: 3px 5px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 14px; letter-spacing: 1px; box-sizing: border-box; }
+.title-icon { margin-right: 5px; filter: drop-shadow(1px 1px rgba(0,0,0,0.1)); display: inline-block; }
+.close-btn { background-color: var(--btn-bg); width: 16px; height: 16px; font-size: 11px; display: flex; justify-content: center; align-items: center; color: var(--txt); z-index: 10; box-sizing: border-box; }
+.content-empty { height: 100px; border: 2px dotted var(--dot); margin-top: 3px; box-sizing: border-box; }
+.content-pattern { padding: 15px; font-size: 14px; color: var(--txt); text-align: center; border: 2px dotted var(--dot); margin-top: 3px; box-sizing: border-box; }
+
+/* Themes structure (Colors linked to vars) */
+.theme-default .title-bar { background: linear-gradient(90deg, var(--title-a), var(--title-b)); color: var(--txt); text-shadow: 1px 1px var(--title-shadow); }
+.theme-info .title-bar { background: linear-gradient(90deg, #7fffcc, #eafff6); color: #0a4a66; }
+.theme-warn .title-bar { background: linear-gradient(90deg, #ffd27f, #fff4e0); color: #664200; }
+.theme-warn .content-empty { border-color: rgba(255, 165, 0, 0.6); }
+.theme-error .title-bar { background: linear-gradient(90deg, #ff7fa0, #ffe0ea); color: #66001e; }
+.theme-error .content-empty { border-color: rgba(255, 90, 130, 0.6); }
+.theme-glitch { background-color: #001018; box-shadow: 0 0 22px rgba(127,230,255,0.35); }
+.theme-glitch .title-bar { background: repeating-linear-gradient(45deg, #001018, #001018 5px, var(--lo) 5px, var(--lo) 10px); color: #ffffff; text-shadow: 2px 0px #ffffff, -2px 0px var(--lo); letter-spacing: -1px; }
+.theme-glitch .content-pattern { background-color: #000a10; border: 2px dashed var(--dot); color: var(--btn-hover); background-image: none; }
+.theme-glitch .close-btn { background-color: #001018; color: var(--lo); }
