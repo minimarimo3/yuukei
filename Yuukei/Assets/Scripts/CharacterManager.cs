@@ -132,6 +132,8 @@ public class CharacterManager : MonoBehaviour
 
                 // VRMの全Rendererに対してアウトライン用のRendering Layerを付与する
                 ApplyOutlineRenderingLayer(_currentVrmInstance.gameObject);
+                // デフォルトのscaleだと小さいので適当に大きくする(2.3)
+                _currentVrmInstance.transform.localScale = new Vector3(2.3f, 2.3f, 2.3f);
 
                 Debug.Log($"[CharacterManager] VRMのロードが完了しました: {characterData.name}");
             }
