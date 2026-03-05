@@ -994,7 +994,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 123.41}
+  m_SizeDelta: {x: 300, y: 152.37}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &730769972
 MonoBehaviour:
@@ -1328,6 +1328,8 @@ MonoBehaviour:
   screenOffset: {x: 0, y: 0}
   enableClamping: 1
   screenPadding: {x: 20, y: 20}
+  backgroundRect: {fileID: 0}
+  tailRect: {fileID: 0}
 --- !u!1 &871263446
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,7 +1364,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 80, y: -71}
+  m_AnchoredPosition: {x: 80, y: -85.479996}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &871263448
@@ -1766,7 +1768,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 123.41}
+  m_SizeDelta: {x: 0, y: 152.37}
   m_Pivot: {x: 0, y: 1}
 --- !u!1001 &1206146148
 PrefabInstance:
@@ -2123,7 +2125,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 8.5, y: -0}
-  m_SizeDelta: {x: 17, y: 123.41}
+  m_SizeDelta: {x: 17, y: 152.37}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1636572263
 MonoBehaviour:
@@ -2145,7 +2147,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u9032\u6357\u3069\u3046\uFF1F"
+  m_text: "\u9032\u6357\u3069\u3046\uFF1F\u9032\u6357\u3069\u3046\uFF1F\u9032\u6357\u3069\u3046\uFF1F\u9032\u6357\u3069\u3046\uFF1F\u9032\u6357\u3069\u3046\uFF1F"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8ed140d0beef3674b8b61c10fa758745, type: 2}
   m_sharedMaterial: {fileID: 5059493531164957764, guid: 8ed140d0beef3674b8b61c10fa758745, type: 2}
@@ -2211,7 +2213,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 10.190857, y: 5.812042, z: 8.88269, w: 88.63428}
+  m_margin: {x: 10.190857, y: 5.812042, z: 23.703857, w: 88.63428}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -2495,7 +2497,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 123.41}
+  m_SizeDelta: {x: 300, y: 152.37}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1988015368
 MonoBehaviour:
