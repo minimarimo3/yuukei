@@ -25,14 +25,37 @@ public class ObjectToBottomRight : MonoBehaviour
         Vector3 viewportBottomRight = new Vector3(1f, 0f, distanceFromCamera);
         Vector3 worldBottomRight = cam.ViewportToWorldPoint(viewportBottomRight);
 
-        // 【重要】親（自身）のスケールを考慮してマージンを調整する
-        // スケールが 2.3 倍なら、マージンも 2.3 倍しないと見た目上の位置がズレるため
-        float currentScale = transform.localScale.x; 
-        Vector3 adjustedMargin = new Vector3(margin.x * currentScale, margin.y * currentScale, 0f);
+        // まずZ座標を目的の奥行きに合わせる
+        Vector3 pos = transform.position;
+        pos.z = worldBottomRight.z;
+        transform.position = pos;
 
-        // マージン分を内側にオフセットして配置
-        Vector3 finalPosition = worldBottomRight + new Vector3(-adjustedMargin.x, adjustedMargin.y, 0f);
-        
-        transform.position = finalPosition;
+        // 画面右下からマージン分内側に入ったワールド座標の目標位置
+        Vector3 targetPos = worldBottomRight + new Vector3(-margin.x, margin.y, 0f);
+
+        // 全ての子RendererからBounds（AABB）を計算して、見た目の右下座標を取得する
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        if (renderers.Length > 0)
+        {
+            Bounds bounds = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
+            {
+                bounds.Encapsulate(renderers[i].bounds);
+            }
+
+            // 現在のBoundsの右下 (XY平面上)
+            Vector3 currentBottomRight = new Vector3(bounds.max.x, bounds.min.y, pos.z);
+
+            // Boundsの右下が目標位置に一致するように移動
+            Vector3 shift = targetPos - currentBottomRight;
+            shift.z = 0; // Zはすでに合わせているので0
+            
+            transform.position += shift;
+        }
+        else
+        {
+            // Rendererが無い場合はオブジェクトの原点を使って配置
+            transform.position = targetPos;
+        }
     }
 }
