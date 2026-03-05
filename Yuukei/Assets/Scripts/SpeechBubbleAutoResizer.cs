@@ -90,14 +90,69 @@ public class SpeechBubbleAutoResizer : MonoBehaviour
         {
             // --- 将来的なスクロールバー対応設計 ---
             
-            // スクロール可能な場合、テキスト（Content）の高さは制限せずに伸ばし続ける
-            RectTransform contentRect = _scrollRect.content;
-            if (contentRect != null && Mathf.Abs(contentRect.sizeDelta.y - textPreferredHeight) > 0.01f)
+            // 1. ScrollView自体の位置とサイズを背景に合わせる
+            RectTransform scrollRectTransform = _scrollRect.GetComponent<RectTransform>();
+            if (scrollRectTransform != null)
             {
-                contentRect.sizeDelta = new Vector2(contentRect.sizeDelta.x, textPreferredHeight);
+                // ScrollViewを上揃えに固定
+                if (scrollRectTransform.anchorMin.y != 1f || scrollRectTransform.anchorMax.y != 1f || scrollRectTransform.pivot.y != 1f)
+                {
+                    scrollRectTransform.anchorMin = new Vector2(scrollRectTransform.anchorMin.x, 1f);
+                    scrollRectTransform.anchorMax = new Vector2(scrollRectTransform.anchorMax.x, 1f);
+                    scrollRectTransform.pivot = new Vector2(scrollRectTransform.pivot.x, 1f);
+                }
+
+                // ScrollViewの高さを「背景の枠 − 上下パディング」に制限
+                float scrollHeight = clampedHeight - _paddingTop - _paddingBottom;
+                if (Mathf.Abs(scrollRectTransform.sizeDelta.y - scrollHeight) > 0.01f)
+                {
+                    scrollRectTransform.sizeDelta = new Vector2(scrollRectTransform.sizeDelta.x, scrollHeight);
+                }
+
+                // ScrollViewのY位置を上パディングの分だけ下げる
+                if (Mathf.Abs(scrollRectTransform.anchoredPosition.y - (-_paddingTop)) > 0.01f)
+                {
+                    scrollRectTransform.anchoredPosition = new Vector2(scrollRectTransform.anchoredPosition.x, -_paddingTop);
+                }
+            }
+            
+            // 2. ContentとTextの高さをテキストの理想的な高さに合わせる
+            RectTransform contentRect = _scrollRect.content;
+            if (contentRect != null)
+            {
+                // Contentを上揃えに固定（スクロールの起点）
+                if (contentRect.anchorMin.y != 1f || contentRect.anchorMax.y != 1f || contentRect.pivot.y != 1f)
+                {
+                    contentRect.anchorMin = new Vector2(contentRect.anchorMin.x, 1f);
+                    contentRect.anchorMax = new Vector2(contentRect.anchorMax.x, 1f);
+                    contentRect.pivot = new Vector2(contentRect.pivot.x, 1f);
+                }
+
+                if (Mathf.Abs(contentRect.sizeDelta.y - textPreferredHeight) > 0.01f)
+                {
+                    contentRect.sizeDelta = new Vector2(contentRect.sizeDelta.x, textPreferredHeight);
+                }
             }
 
-            // 最大高さを超えたときだけ縦スクロールを有効にする
+            RectTransform textRect = _textComponent.rectTransform;
+            if (textRect != null)
+            {
+                // Textを上揃えに固定し、Contentの一番上に配置
+                if (textRect.anchorMin.y != 1f || textRect.anchorMax.y != 1f || textRect.pivot.y != 1f)
+                {
+                    textRect.anchorMin = new Vector2(textRect.anchorMin.x, 1f);
+                    textRect.anchorMax = new Vector2(textRect.anchorMax.x, 1f);
+                    textRect.pivot = new Vector2(textRect.pivot.x, 1f);
+                    textRect.anchoredPosition = new Vector2(textRect.anchoredPosition.x, 0f);
+                }
+
+                if (Mathf.Abs(textRect.sizeDelta.y - textPreferredHeight) > 0.01f)
+                {
+                    textRect.sizeDelta = new Vector2(textRect.sizeDelta.x, textPreferredHeight);
+                }
+            }
+
+            // 3. 最大高さを超えたときだけ縦スクロールを有効にする
             bool isOverMaxHeight = targetHeight > _maxHeight;
             _scrollRect.vertical = isOverMaxHeight;
         }
