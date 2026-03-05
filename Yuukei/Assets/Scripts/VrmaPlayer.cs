@@ -20,30 +20,13 @@ public class VrmaPlayer : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 設定されたVRMAアニメーションを現在ロード中のVRMに適用して再生します
-    /// </summary>
     [ContextMenu("Play VRMA Animation")]
     public void PlayAnimation()
     {
-        if (characterManager == null || characterManager.CurrentVrmInstance == null)
-        {
-            Debug.LogWarning("[VrmaPlayer] VRMキャラクターがまだロードされていません。");
-            return;
-        }
+        if (characterManager == null || characterManager.CurrentVrmInstance == null) return;
+        if (vrmaPrefab == null) return;
 
-        if (vrmaPrefab == null)
-        {
-            Debug.LogWarning("[VrmaPlayer] VRMAプレハブがInspectorに設定されていません。");
-            return;
-        }
-
-        if (_playingInstance != null)
-        {
-            Destroy(_playingInstance.gameObject);
-        }
-
-        Debug.Log("[VrmaPlayer] VRMAアニメーションを適用します。");
+        if (_playingInstance != null) Destroy(_playingInstance.gameObject);
 
         var wasActive = vrmaPrefab.gameObject.activeSelf;
         vrmaPrefab.gameObject.SetActive(false);
@@ -52,14 +35,15 @@ public class VrmaPlayer : MonoBehaviour
         
         var currentVrm = characterManager.CurrentVrmInstance;
 
-        // 対象VRMのローカル座標を一度リセットして基準位置のズレ（ワープ）を防ぐ
         currentVrm.transform.localPosition = Vector3.zero;
         currentVrm.transform.localRotation = Quaternion.identity;
         
-        // 【重要】アニメーションソースはVRMの「兄弟オブジェクト」として配置する
         _playingInstance.transform.SetParent(currentVrm.transform.parent, false);
         _playingInstance.transform.localPosition = currentVrm.transform.localPosition;
         _playingInstance.transform.localRotation = currentVrm.transform.localRotation;
+        
+        // 【修正】ローカルスケールは 1.0 に戻す（親の CharacterRoot のスケールが適用されるため）
+        _playingInstance.transform.localScale = Vector3.one;
 
         if (_playingInstance.ControlRig.Item1 == null || _playingInstance.ControlRig.Item2 == null)
         {
@@ -77,9 +61,7 @@ public class VrmaPlayer : MonoBehaviour
             }
         }
 
-        // デバッグ用のグレーのメッシュ(BoxMan)は非表示にする
         _playingInstance.ShowBoxMan(false);
-
         currentVrm.Runtime.VrmAnimation = _playingInstance;
 
         var anim = _playingInstance.GetComponent<Animation>();
