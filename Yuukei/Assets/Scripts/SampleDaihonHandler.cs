@@ -30,6 +30,10 @@ namespace Daihon.Samples
         [SerializeField, Tooltip("VRM 口パクコンポーネント（任意）")]
         private VRMLipSync _lipSync;
 
+        [Header("ふきだしテキスト")]
+        [SerializeField, Tooltip("TalkCanvasのテキスト")]
+        private TMPro.TextMeshProUGUI _speechBubbleText;
+
         private void Start()
         {
             RunSampleAsync().Forget();
@@ -53,6 +57,11 @@ namespace Daihon.Samples
         public async UniTask ShowDialogueAsync(string text)
         {
             Debug.Log($"<color=yellow>[セリフ]</color> {text}");
+
+            if (_speechBubbleText != null)
+            {
+                _speechBubbleText.text = text;
+            }
 
             var ct = this.GetCancellationTokenOnDestroy();
 

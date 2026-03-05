@@ -1303,7 +1303,7 @@ MonoBehaviour:
   targetBubble: {fileID: 1546513617}
   canvasRect: {fileID: 845719448}
   targetCamera: {fileID: 330585545}
-  worldOffset: {x: 0, y: 0.4, z: 0}
+  worldOffset: {x: 0, y: 1.5, z: 0}
   screenOffset: {x: 0, y: 0}
   enableClamping: 1
   screenPadding: {x: 20, y: 20}
@@ -2164,6 +2164,7 @@ MonoBehaviour:
     \u300C\u6539\u3081\u3066\u3001\u3088\u308D\u3057\u304F\u306D\uFF01\uFF1C\u30E6\u30FC\u30B6\u30FC\u540D\uFF1E\u3055\u3093\uFF01\u300D\r\n\u304A\u308F\u308A"
   _dialogueWaitSeconds: 1.5
   _lipSync: {fileID: 678740292}
+  _speechBubbleText: {fileID: 1636572263}
 --- !u!1 &2025645563
 GameObject:
   m_ObjectHideFlags: 0
