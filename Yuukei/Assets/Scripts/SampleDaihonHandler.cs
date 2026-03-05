@@ -34,6 +34,10 @@ namespace Daihon.Samples
         [SerializeField, Tooltip("TalkCanvasのテキスト")]
         private TMPro.TextMeshProUGUI _speechBubbleText;
 
+        [Header("モーション")]
+        [SerializeField, Tooltip("VRMAアニメーション再生用コンポーネント")]
+        private VrmaPlayer _vrmaPlayer;
+
         private void Start()
         {
             RunSampleAsync().Forget();
@@ -107,6 +111,26 @@ namespace Daihon.Samples
             //         await UniTask.Delay(TimeSpan.FromSeconds(positionalArgs[0].AsNumber()));
             //         break;
             // }
+
+            switch(functionName) {
+                case "動作":
+                    if (argsStr.Contains("歩行") ) {
+                        if (_vrmaPlayer != null) {
+                            _vrmaPlayer.PlayAnimation();
+                        } else {
+                            Debug.LogWarning("[SampleDaihonHandler] VrmaPlayerへの参照が設定されていません。");
+                        }
+                    }
+                    else if (argsStr.Contains("停止")) {
+                        if (_vrmaPlayer != null) {
+                            _vrmaPlayer.StopAnimation();
+                        }
+                    }
+                    break;
+                default:
+                    Debug.LogWarning($"[Daihon] 未定義の関数呼び出し: {functionName}");
+                    break;
+            }
 
             return UniTask.FromResult(DaihonValue.None);
         }
