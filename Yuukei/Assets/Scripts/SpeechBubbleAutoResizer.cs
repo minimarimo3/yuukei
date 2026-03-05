@@ -30,15 +30,37 @@ public class SpeechBubbleAutoResizer : MonoBehaviour
     [SerializeField, Tooltip("吹き出しの最大の高さ（これを超えたらスクロールで対処）")]
     private float _maxHeight = 300f;
 
+    [Header("UI連携（オプション）")]
+    [SerializeField, Tooltip("吹き出しのしっぽ（Tail）。背景が伸びた際に一緒に下へ移動させたい場合に指定")]
+    private RectTransform _tailRect;
+
     [Header("スクロール対応（将来用・今回は未設定でOKです）")]
     [SerializeField, Tooltip("テキストが長すぎる場合にスクロールさせるためのScrollRect")]
     private ScrollRect _scrollRect;
+
+    private float _initialTailLocalY;
+    private float _initialBackgroundHeight;
 
     private void Reset()
     {
         _backgroundRect = GetComponent<RectTransform>();
         _textComponent = GetComponentInChildren<TextMeshProUGUI>();
         _scrollRect = GetComponentInChildren<ScrollRect>();
+        if (transform.parent != null)
+        {
+            var tail = transform.parent.Find("Tail");
+            if (tail != null) _tailRect = tail.GetComponent<RectTransform>();
+        }
+    }
+
+    private void Start()
+    {
+        // 最初のしっぽの「初期位置（Y）」と「初期の背景の高さ」を記憶しておく
+        if (_tailRect != null && _backgroundRect != null)
+        {
+            _initialTailLocalY = _tailRect.localPosition.y;
+            _initialBackgroundHeight = _backgroundRect.rect.height;
+        }
     }
 
     private void LateUpdate()
@@ -155,6 +177,20 @@ public class SpeechBubbleAutoResizer : MonoBehaviour
             // 3. 最大高さを超えたときだけ縦スクロールを有効にする
             bool isOverMaxHeight = targetHeight > _maxHeight;
             _scrollRect.vertical = isOverMaxHeight;
+        }
+
+        // 5. Tail（しっぽ）の連動移動処理
+        if (_tailRect != null && _initialBackgroundHeight > 0f)
+        {
+            // 背景が初期状態からどれだけ上下に伸びたか（差分）の「半分」だけ下に移動させる
+            // Pivotが通常Center(0.5)と仮定したとき、高さが伸びると下端は「伸びた分の半分」だけ下がるため
+            float heightDiff = clampedHeight - _initialBackgroundHeight;
+            float targetTailY = _initialTailLocalY - (heightDiff * 0.5f);
+            
+            if (Mathf.Abs(_tailRect.localPosition.y - targetTailY) > 0.01f)
+            {
+                _tailRect.localPosition = new Vector3(_tailRect.localPosition.x, targetTailY, _tailRect.localPosition.z);
+            }
         }
     }
 }

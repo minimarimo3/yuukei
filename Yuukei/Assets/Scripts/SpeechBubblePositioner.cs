@@ -123,12 +123,15 @@ public class SpeechBubblePositioner : MonoBehaviour
         Rect bRect = targetBubble.rect;
         Vector2 pivot = targetBubble.pivot;
 
-        // はみ出さないための限界座標（Min / Max）をピボットを考慮して計算
-        float minX = cRect.min.x + (bRect.width * pivot.x) + screenPadding.x;
-        float maxX = cRect.max.x - (bRect.width * (1f - pivot.x)) - screenPadding.x;
+        // はみ出さないための限界座標（Min / Max）をピボットと「スケール(localScale)」を考慮して計算
+        float scaledWidth = bRect.width * targetBubble.localScale.x;
+        float scaledHeight = bRect.height * targetBubble.localScale.y;
 
-        float minY = cRect.min.y + (bRect.height * pivot.y) + screenPadding.y;
-        float maxY = cRect.max.y - (bRect.height * (1f - pivot.y)) - screenPadding.y;
+        float minX = cRect.min.x + (scaledWidth * pivot.x) + screenPadding.x;
+        float maxX = cRect.max.x - (scaledWidth * (1f - pivot.x)) - screenPadding.x;
+
+        float minY = cRect.min.y + (scaledHeight * pivot.y) + screenPadding.y;
+        float maxY = cRect.max.y - (scaledHeight * (1f - pivot.y)) - screenPadding.y;
 
         // もし画面が小さすぎて min > max になってしまう場合は中央をとる
         if (minX > maxX)
