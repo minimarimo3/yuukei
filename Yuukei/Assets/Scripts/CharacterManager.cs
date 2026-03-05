@@ -21,6 +21,9 @@ public class CharacterManager : MonoBehaviour
     /// <summary>現在ロードされているVRMインスタンスへの外部参照</summary>
     public Vrm10Instance CurrentVrmInstance => _currentVrmInstance;
 
+    // URPの「Layer 1」を使用する場合は「2」(1 << 1)、「Layer 2」なら「4」(1 << 2)を指定します。
+    private uint outlineRenderingLayerMask = 256;
+
     private void Start()
     {
         if (configManager != null)
@@ -123,9 +126,12 @@ public class CharacterManager : MonoBehaviour
                 {
                     _currentVrmInstance.transform.SetParent(characterRoot, false);
                 }
-
+                
                 // ロード直後にやりたい初期化処理があればここに記述します。
                 // (例: アニメーターの設定、カメラの注視点(LookAt)の設定など)
+
+                // VRMの全Rendererに対してアウトライン用のRendering Layerを付与する
+                ApplyOutlineRenderingLayer(_currentVrmInstance.gameObject);
 
                 Debug.Log($"[CharacterManager] VRMのロードが完了しました: {characterData.name}");
             }
@@ -134,5 +140,20 @@ public class CharacterManager : MonoBehaviour
         {
             Debug.LogError($"[CharacterManager] VRMのロードに失敗しました: {ex.Message}\n{ex.StackTrace}");
         }
+    }
+
+    // モデル内の全RendererにRendering Layerを追加するメソッド
+    private void ApplyOutlineRenderingLayer(GameObject vrmRoot)
+    {
+        // VRM内のすべてのRenderer (MeshRenderer, SkinnedMeshRendererなど) を取得
+        Renderer[] renderers = vrmRoot.GetComponentsInChildren<Renderer>(true);
+        
+        foreach (Renderer renderer in renderers)
+        {
+            // 既存のRendering Layer (通常はDefaultの1) に、アウトライン用のレイヤーをOR演算で追加する
+            renderer.renderingLayerMask |= outlineRenderingLayerMask;
+        }
+        
+        Debug.Log("[CharacterManager] キャラクターにアウトライン用の Rendering Layer を適用しました。");
     }
 }

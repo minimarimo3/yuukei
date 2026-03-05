@@ -44,3 +44,5 @@ UniTaskを利用するために[UniTaskのリリースページ](https://github.
 - WindowsでExplorerの要素を検出するために[ExplorerScanner](https://github.com/minimarimo3/ExplorerScanner)を使用しています。
 ExplorerScannerの[リリースページ](https://github.com/minimarimo3/ExplorerScanner/releases)にExplorerScanner.dllがあります。
 これを`Assets/Plugins`に配置してください。
+
+- アウトラインを出すために[Free Outline](https://assetstore.unity.com/packages/vfx/shaders/free-outline-326925)を使用しています。
