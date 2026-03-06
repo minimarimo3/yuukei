@@ -144,59 +144,77 @@ public class DaihonScenarioManager : MonoBehaviour
 
                 foreach (var scenario in info.Scenarios)
                 {
-                    // 1つのファイル（イベント）内でのシーン走査
-                    bool anyTriggeredSceneExecuted = false;
+                    var targetScenes = new List<DaihonSceneMetadata>();
+                    var monitorScenes = new List<DaihonSceneMetadata>();
                     var defaultScenes = new List<DaihonSceneMetadata>();
-                    var candidateScenes = new List<DaihonSceneMetadata>();
 
+                    // 1. 各ファイルのシーンを分類
                     foreach (var sceneMeta in scenario.Scenes)
                     {
                         bool hasSignal = sceneMeta.SystemEvents.Length > 0;
-                        bool hasCondition = sceneMeta.HasCondition;
 
-                        // デフォルトシーン
-                        if (!hasSignal && !hasCondition)
+                        if (hasSignal)
                         {
-                            defaultScenes.Add(sceneMeta);
-                            continue;
+                            if (Array.IndexOf(sceneMeta.SystemEvents, systemEventName) >= 0)
+                            {
+                                targetScenes.Add(sceneMeta);
+                            }
                         }
-
-                        // 合図が一致するか、合図がない（条件のみ常時監視）シーンを候補に
-                        bool signalMatches = !hasSignal || Array.IndexOf(sceneMeta.SystemEvents, systemEventName) >= 0;
-                        if (signalMatches)
+                        else
                         {
-                            candidateScenes.Add(sceneMeta);
+                            if (sceneMeta.HasCondition)
+                            {
+                                monitorScenes.Add(sceneMeta);
+                            }
+                            else
+                            {
+                                defaultScenes.Add(sceneMeta);
+                            }
                         }
                     }
 
-                    // 候補シーンがなかった場合はデフォルトシーンの評価に進む
-                    if (candidateScenes.Count > 0)
+                    // 2. targetScenes を上から順に評価
+                    bool anyTargetSceneExecuted = false;
+                    foreach (var scene in targetScenes)
                     {
-                        // 候補となる条件付きシーンが見つかったため、順番に評価・可能なら実行する
-                        foreach (var scene in candidateScenes)
+                        bool conditionResult = true; // 条件がない場合は真とする
+                        
+                        // 条件式（AST）が存在する場合は評価する
+                        if (scene.HasCondition && scene.ConditionContext != null)
                         {
-                            bool conditionResult = true; // 条件がない場合は真とする
-                            
-                            // 条件式（AST）が存在する場合は評価する
-                            if (scene.HasCondition && scene.ConditionContext != null)
-                            {
-                                conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store);
-                            }
+                            conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store);
+                        }
 
-                            // 評価結果が true の場合のみ実行
-                            if (conditionResult)
-                            {
-                                await DaihonRunner.RunSceneAsync(scenario.ScriptText, scene.SceneName, handler, store);
-                                anyTriggeredSceneExecuted = true;
-                            }
+                        // 評価結果が true の場合のみ実行
+                        if (conditionResult)
+                        {
+                            await DaihonRunner.RunSceneAsync(scenario.ScriptText, scene.SceneName, handler, store);
+                            anyTargetSceneExecuted = true;
                         }
                     }
 
-                    // 条件付きシーンが1つも実行されなかった場合のみ、デフォルトシーンからランダムに1つ実行
-                    if (!anyTriggeredSceneExecuted && defaultScenes.Count > 0)
+                    // 3. 【重要】targetScenes.Count > 0 なのに1つも実行されなかった場合のみ、デフォルトシーンからランダムに1つ実行
+                    if (targetScenes.Count > 0 && !anyTargetSceneExecuted && defaultScenes.Count > 0)
                     {
                         var chosenDefault = defaultScenes[UnityEngine.Random.Range(0, defaultScenes.Count)];
                         await DaihonRunner.RunSceneAsync(scenario.ScriptText, chosenDefault.SceneName, handler, store);
+                    }
+
+                    // 4. monitorScenes はシステムイベントの種別に関係なく毎回評価
+                    foreach (var scene in monitorScenes)
+                    {
+                        bool conditionResult = true;
+                        
+                        // 条件式（AST）が存在する場合は評価する
+                        if (scene.ConditionContext != null)
+                        {
+                            conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store);
+                        }
+
+                        if (conditionResult)
+                        {
+                            await DaihonRunner.RunSceneAsync(scenario.ScriptText, scene.SceneName, handler, store);
+                        }
                     }
                 }
             }
