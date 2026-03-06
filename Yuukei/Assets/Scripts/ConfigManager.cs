@@ -3,13 +3,32 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-// --- データ構造の定義 ---
+// --- データ構造の定義 (§2) ---
 [Serializable]
 public class CharacterData
 {
-    public string id;
+    public string id;        // Guid.NewGuid().ToString() で生成
+    public string name;      // ファイル名（拡張子なし）をデフォルト値とする
+    public string filePath;  // モデルファイルやアセットバンドルの絶対パス
+}
+
+[Serializable]
+public class PackageInfo
+{
+    public string id;           // package.json の "id" フィールド
     public string name;
-    public string filePath; // モデルファイルやアセットバンドルの絶対パス
+    public string version;
+    public string installPath;  // persistentDataPath/Packages/{id}/
+    public bool enabled;        // false の場合 TriggerManager はトリガーをスキップする
+}
+
+[Serializable]
+public class LLMSettings
+{
+    public string provider = "none"; // "none" | "cloud" | "local"
+    public string endpointUrl = "";  // クラウド: APIエンドポイント, ローカル: OllamaのURL
+    public string modelName = "";
+    // NOTE: APIキーはここには保存しない。ICredentialStorage を使う（§3参照）。
 }
 
 [Serializable]
@@ -17,6 +36,9 @@ public class AppSettings
 {
     public string currentCharacterId = "";
     public List<CharacterData> savedCharacters = new List<CharacterData>();
+    public string activePackageId = "";
+    public List<PackageInfo> installedPackages = new List<PackageInfo>();
+    public LLMSettings llmSettings = new LLMSettings();
 }
 
 // --- 管理クラス ---
@@ -86,6 +108,8 @@ public class ConfigManager : MonoBehaviour
     }
 
     // --- キャラクター操作用API ---
+
+    /// <summary>キャラクターを登録し即座にSaveする</summary>
     public void AddCharacter(string name, string filePath)
     {
         var newChar = new CharacterData
@@ -99,7 +123,8 @@ public class ConfigManager : MonoBehaviour
     }
 
     /// <summary>
-    /// UI等から現在のキャラクターを変更する際に呼び出すメソッド
+    /// currentCharacterIdを変更してSaveし、OnCharacterChangedを発火する。
+    /// 同じIDが渡された場合は何もしない。
     /// </summary>
     public void SetCurrentCharacter(string characterId)
     {
@@ -107,9 +132,23 @@ public class ConfigManager : MonoBehaviour
 
         Settings.currentCharacterId = characterId;
         SaveSettings();
-        
-        // 変更イベントを発火
+
         OnCharacterChanged?.Invoke(characterId);
     }
 
+    // --- パッケージ操作用API (§4) ---
+
+    /// <summary>パッケージを登録してSaveする</summary>
+    public void AddPackage(PackageInfo info)
+    {
+        Settings.installedPackages.Add(info);
+        SaveSettings();
+    }
+
+    /// <summary>パッケージを削除してSaveする</summary>
+    public void RemovePackage(string packageId)
+    {
+        Settings.installedPackages.RemoveAll(p => p.id == packageId);
+        SaveSettings();
+    }
 }

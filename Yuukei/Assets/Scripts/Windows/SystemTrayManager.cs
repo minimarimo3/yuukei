@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Windows.Forms;
 using Application = UnityEngine.Application;
 
+[System.Obsolete("Use PlatformBootstrapper + IAppIntegration instead")]
 public class SystemTrayManager : MonoBehaviour
 {
     [Header("Settings")]

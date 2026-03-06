@@ -3,6 +3,7 @@ using System.Diagnostics; // プロセス情報の取得に必要
 using System;
 using System.Runtime.InteropServices;
 
+[System.Obsolete("Use PlatformBootstrapper + IAppIntegration instead")]
 public class MultiMonitorEnabler : MonoBehaviour
 {
     // --- Windows API ---

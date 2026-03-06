@@ -3,6 +3,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
+[System.Obsolete("Use PlatformBootstrapper + IAppIntegration instead")]
 public class TaskbarIconHider : MonoBehaviour
 {
     // --- Windows API ---
