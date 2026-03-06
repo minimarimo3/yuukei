@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -l \"SpeechBubbleController\" \"C:\\\\Users\\\\minimarimo3\\\\Sagyouba\\\\Yuukei\\\\Yuukei/Assets/Scripts\"/*.cs)"
+      "Bash(grep -l \"SpeechBubbleController\" \"C:\\\\Users\\\\minimarimo3\\\\Sagyouba\\\\Yuukei\\\\Yuukei/Assets/Scripts\"/*.cs)",
+      "Bash(grep -r \"float\\\\|bobbing\\\\|floating\\\\|animate\\\\|position\" Assets/Scripts/*.cs)",
+      "Bash(grep -r \"Rigidbody\\\\|Animator\\\\|Animation\\\\|GetComponent\" Assets/Scripts/*.cs)",
+      "Bash(wc -l Assets/Scripts/*.cs)",
+      "Bash(xargs grep -l \"UniTask\\\\|async\\\\|await\")"
     ]
   }
 }

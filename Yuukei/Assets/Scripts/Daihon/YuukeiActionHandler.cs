@@ -21,6 +21,7 @@ public class YuukeiActionHandler : MonoBehaviour, IUniTaskActionHandler
     [SerializeField] private CharacterManager characterManager;
     [SerializeField] private VRMLipSync lipSync;
     [SerializeField] private VrmaPlayer vrmaPlayer;
+    [SerializeField] private FloatingMotionController floatingMotion;
     [SerializeField] private SpeechBubbleController speechBubble;
     [SerializeField] private LLMBridge llmBridge;
 
@@ -57,6 +58,7 @@ public class YuukeiActionHandler : MonoBehaviour, IUniTaskActionHandler
         IReadOnlyList<DaihonValue> positionalArgs,
         IReadOnlyDictionary<string, DaihonValue> namedArgs)
     {
+        Debug.Log($"[YuukeiActionHandler] 関数呼び出し: 「{functionName}」");
         switch (functionName)
         {
             case "表情":
@@ -77,6 +79,9 @@ public class YuukeiActionHandler : MonoBehaviour, IUniTaskActionHandler
 
             case "LLM":
                 return await HandleLLMAsync(positionalArgs);
+
+            case "移動":
+                return await HandleMoveAsync(positionalArgs);
 
             case "選択肢表示":
                 return HandleChoices(positionalArgs);
@@ -200,6 +205,32 @@ public class YuukeiActionHandler : MonoBehaviour, IUniTaskActionHandler
         var response = await bridge.ChatAsync(prompt);
         return DaihonValue.FromString(response);
     }
+
+        private async UniTask<DaihonValue> HandleMoveAsync(IReadOnlyList<DaihonValue> args)
+    {
+        if (floatingMotion == null)
+        {
+            Debug.LogWarning("[YuukeiActionHandler] 「移動」: FloatingMotionController が未設定です。");
+            return DaihonValue.None;
+        }
+
+        Vector3 targetPos = Camera.main.ViewportToWorldPoint(new Vector3(floatingMotion.AnchorPosition.x, floatingMotion.AnchorPosition.y, 0));
+
+        // 移動の引数はビューポートの座標(0~1000)で指定する
+        if (args.Count >= 1) {
+            targetPos.x = Camera.main.ViewportToWorldPoint(new Vector3((float)(args[0].AsNumber() / 1000.0), targetPos.y, 0)).x;
+        }
+        if (args.Count >= 2) {
+            targetPos.y = Camera.main.ViewportToWorldPoint(new Vector3(targetPos.x, (float)(args[1].AsNumber() / 1000.0), 0)).y;
+        }
+        
+        Debug.Log($"[YuukeiActionHandler] 移動: 「{targetPos.x}, {targetPos.y}」");
+        var target = new Vector3(targetPos.x, targetPos.y, floatingMotion.AnchorPosition.z);
+
+        await floatingMotion.MoveToAsync(target, this.GetCancellationTokenOnDestroy());
+        return DaihonValue.None;
+    }
+
 
     private DaihonValue HandleChoices(IReadOnlyList<DaihonValue> args)
     {

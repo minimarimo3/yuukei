@@ -57,5 +57,8 @@ public class ObjectToBottomRight : MonoBehaviour
             // Rendererが無い場合はオブジェクトの原点を使って配置
             transform.position = targetPos;
         }
+
+        // FloatingMotionController にアンカー位置を通知（浮遊の基準点を更新）
+        GetComponent<FloatingMotionController>()?.SetAnchorPosition(transform.position);
     }
 }
