@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Sakura UI 素材カタログ</title>
+  <style>
+
+/* ===== 共通（Moe.html 互換の構造）===== */
+body {
+  background-color: #2b2b2b;
+  color: #ffffff;
+  font-family: 'MS PGothic', 'ＭＳ Ｐゴシック', sans-serif;
+  padding: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* 立体枠：テーマごとに CSS 変数で色を差し替える */
+:root{
+  --hi: #ffffff;   /* ハイライト（左上） */
+  --lo: #ff1493;   /* シャドウ（右下） */
+  --win-bg: #ffe6f2;
+  --shadow: rgba(255, 20, 147, 0.4);
+  --txt: #cc0066;
+  --dot: #ff66b2;
+  --title-a: #ff007f;
+  --title-b: #ffb3d9;
+  --title-shadow: #cc0066;
+  --btn-bg: #ff99cc;
+}
+
+.border-outset {
+  border-top: 3px solid var(--hi);
+  border-left: 3px solid var(--hi);
+  border-right: 3px solid var(--lo);
+  border-bottom: 3px solid var(--lo);
+}
+.border-inset {
+  border-top: 3px solid var(--lo);
+  border-left: 3px solid var(--lo);
+  border-right: 3px solid var(--hi);
+  border-bottom: 3px solid var(--hi);
+}
+
+.catalog-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #aaaaaa;
+}
+
+/* ウィンドウ共通ベース */
+.moe-window {
+  width: 300px;
+  background-color: var(--win-bg);
+  padding: 3px;
+  box-shadow: 0 0 15px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.title-bar {
+  color: white;
+  padding: 3px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  text-shadow: 1px 1px var(--title-shadow);
+}
+.close-btn {
+  background-color: var(--btn-bg);
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 中身：パターンあり */
+.content-pattern {
+  padding: 15px;
+  font-size: 14px;
+  color: var(--txt);
+  text-align: center;
+  border: 2px dotted var(--dot);
+  margin-top: 3px;
+  background-image: radial-gradient(rgba(255,255,255,0.25) 25%, transparent 25%);
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+/* 空コンテンツ（Unity側で文字を載せる） */
+.content-empty {
+  height: 100px;
+  border: 2px dotted var(--dot);
+  margin-top: 3px;
+  background-image: radial-gradient(rgba(255,255,255,0.25) 25%, transparent 25%);
+  background-position: 0 0, 10px 10px;
+  background-size: 20px 20px;
+}
+
+/* 入力欄 */
+.moe-input {
+  background-color: #ffffff;
+  width: 250px;
+  height: 30px;
+  background-image: repeating-linear-gradient(transparent, transparent 2px, rgba(255,255,255,0.0) 3px, rgba(255,255,255,0.0) 3px);
+}
+
+/* 吹き出し */
+.speech-bubble {
+  background-color: var(--win-bg);
+  padding: 15px;
+  border: 2px dotted var(--dot);
+  position: relative;
+  width: 200px;
+  text-align: center;
+  color: var(--txt);
+  font-weight: bold;
+  box-shadow: 2px 2px 0px var(--lo);
+  min-height: 40px;
+}
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 20px;
+  border-width: 15px 15px 0 0;
+  border-style: solid;
+  border-color: var(--win-bg) transparent transparent transparent;
+}
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 18px;
+  border-width: 18px 18px 0 0;
+  border-style: solid;
+  border-color: var(--dot) transparent transparent transparent;
+  z-index: -1;
+}
+
+/* ボタン */
+.moe-btn {
+  background-color: var(--lo);
+  color: white;
+  padding: 5px 15px;
+  font-family: 'MS PGothic', sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block;
+  text-align: center;
+  width: 100px;
+}
+
+/* プログレスバー */
+.progress-bg {
+  width: 250px;
+  height: 20px;
+  background-color: #000000;
+}
+.progress-fill {
+  width: 244px;
+  height: 14px;
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+}
+
+/* タイトルアイコン（任意） */
+.title-icon{
+  display:inline-block;
+  width: 14px;
+  margin-right:6px;
+  text-align:center;
+  filter: drop-shadow(1px 1px rgba(0,0,0,0.25));
+}
+
+
+/* ===== Sakura テーマ変数 ===== */
+:root{
+  --hi: #ffffff;
+  --lo: #ff6fb6;
+  --win-bg: #fff3f8;
+  --shadow: rgba(255, 120, 190, 0.25);
+  --txt: #b10052;
+  --dot: #ff8fc6;
+  --title-a: #ff6fb6;
+  --title-b: #ffd0e6;
+  --title-shadow: #b10052;
+  --btn-bg: #ffc1dc;
+}
+
+
+.content-pattern,.content-empty{ background-image:
+  radial-gradient(#ffe3f1 30%, transparent 31%),
+  radial-gradient(#ffd0e6 25%, transparent 26%);
+  background-size: 20px 20px, 28px 28px;
+  background-position: 0 0, 10px 12px;
+}
+.moe-input{ background-image: repeating-linear-gradient(transparent, transparent 2px, #ffe3f1 3px, #ffe3f1 3px); }
+.moe-window::before{ content:""; position:absolute; inset:-20px; pointer-events:none;
+  background:
+    radial-gradient(closest-side, rgba(255,160,210,0.18), transparent 70%) 15% 20%/120px 120px,
+    radial-gradient(closest-side, rgba(255,160,210,0.14), transparent 70%) 70% 35%/140px 140px,
+    radial-gradient(closest-side, rgba(255,160,210,0.12), transparent 70%) 40% 85%/160px 160px;
+}
+
+
+
+
+/* 種別カラー（Sakura） */
+.theme-default .title-bar{ background: linear-gradient(90deg, #ff6fb6, #ffd0e6); }
+.theme-info    .title-bar{ background: linear-gradient(90deg, #7fd6ff, #e7f6ff); text-shadow:1px 1px #2a6a86; }
+.theme-warn    .title-bar{ background: linear-gradient(90deg, #ffaa88, #ffe2d6); text-shadow:1px 1px #a04a2a; }
+.theme-error   .title-bar{ background: linear-gradient(90deg, #ff3355, #ffd6de); text-shadow:1px 1px #7a0a20; }
+.theme-glitch  { background-color:#1a0010; box-shadow:0 0 22px rgba(255,110,182,0.35); }
+.theme-glitch  .title-bar{ background: repeating-linear-gradient(45deg, #1a0010, #1a0010 5px, #ff6fb6 5px, #ff6fb6 10px);
+  text-shadow:2px 0px #fff, -2px 0px #ff6fb6; letter-spacing:-1px; }
+.theme-glitch .content-pattern{ background-color:#0e0008; border:2px dashed #ff8fc6; color:#ffb3d9; background-image:none; }
+
+  </style>
+</head>
+<body>
+
+  <div class="catalog-item">
+    <span class="label">汎用ウィンドウ（文字はUnityで乗せる用）</span>
+    <div class="moe-window border-outset theme-default">
+      <div class="title-bar"><span>†┏┛ さ く ら 区 域 ┗┓†</span>
+        <div class="close-btn border-outset">X</div>
+      </div>
+      <div class="content-empty"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">Infoウィンドウ</span>
+    <div class="moe-window border-outset theme-info">
+      <div class="title-bar"><span>ℹ おしらせ</span>
+        <div class="close-btn border-outset">X</div>
+      </div>
+      <div class="content-empty"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">Warningウィンドウ</span>
+    <div class="moe-window border-outset theme-warn">
+      <div class="title-bar"><span>⚠ ちゅうい</span>
+        <div class="close-btn border-outset">X</div>
+      </div>
+      <div class="content-empty"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">Errorウィンドウ</span>
+    <div class="moe-window border-outset theme-error">
+      <div class="title-bar"><span>❌ たいへん！</span>
+        <div class="close-btn border-outset">X</div>
+      </div>
+      <div class="content-empty"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">バグ・グリッチウィンドウ（文字入りサンプル）</span>
+    <div class="moe-window border-outset theme-glitch">
+      <div class="title-bar"><span>ゆめの ほころび</span>
+        <div class="close-btn border-outset">X</div>
+      </div>
+      <div class="content-pattern">
+0x00000000&lt;br&gt;まよいこんだ…&lt;br&gt;さくらの ばぐ #$%
+</div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">入力欄（空）</span>
+    <div class="moe-input border-inset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">汎用ボタン（空）</span>
+    <div class="moe-btn border-outset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">吹き出し（空）</span>
+    <div class="speech-bubble"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">プログレスバー（①外枠）</span>
+    <div class="progress-bg border-inset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">プログレスバー（②中身）</span>
+    <div class="progress-fill"></div>
+  </div>
+
+</body>
+</html>

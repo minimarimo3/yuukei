@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Windows 3.1 風 UI 素材カタログ</title>
+  <style>
+
+/* ===== 超古いWindows風 UI 素材カタログ ===== */
+body{
+  background:#2b2b2b;
+  color:#fff;
+  font-family: "MS Sans Serif", "Microsoft Sans Serif", sans-serif;
+  padding:40px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:40px;
+  align-items:flex-start;
+}
+
+:root{
+  --hi:#ffffff;           /* 左上ハイライト */
+  --mid:#c0c0c0;          /* 面 */
+  --lo:#404040;           /* 右下シャドウ */
+  --lo2:#000000;          /* さらに濃い影（アクセント） */
+  --title-a:#000080;      /* タイトル左 */
+  --title-b:#1084d0;      /* タイトル右 */
+  --title-text:#ffffff;
+  --title-shadow: rgba(0,0,0,0.0);
+  --content-text:#000;
+  --dot:#808080;
+  --shadow: rgba(0,0,0,0.25);
+  --btn-face:#c0c0c0;
+  --btn-text:#000;
+}
+
+/* 3D 枠（クラシック） */
+.border-outset{
+  border-top: 2px solid var(--hi);
+  border-left: 2px solid var(--hi);
+  border-right: 2px solid var(--lo);
+  border-bottom: 2px solid var(--lo);
+  box-shadow: 1px 1px 0 var(--lo2);
+}
+.border-inset{
+  border-top: 2px solid var(--lo);
+  border-left: 2px solid var(--lo);
+  border-right: 2px solid var(--hi);
+  border-bottom: 2px solid var(--hi);
+  box-shadow: inset 1px 1px 0 var(--lo2);
+}
+
+.catalog-item{ display:flex; flex-direction:column; gap:10px; }
+.label{ font-size:14px; font-weight:bold; color:#aaaaaa; }
+
+.window{
+  width:300px;
+  background: var(--mid);
+  padding:2px;
+  box-shadow: 0 0 14px var(--shadow);
+}
+
+.titlebar{
+  background: linear-gradient(90deg, var(--title-a), var(--title-b));
+  color: var(--title-text);
+  padding:2px 4px;
+  font-size:13px;
+  font-weight:bold;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  letter-spacing:0.3px;
+  text-shadow: 1px 1px var(--title-shadow);
+}
+
+.win-controls{ display:flex; gap:2px; }
+.win-btn{
+  width:16px; height:14px;
+  background: var(--btn-face);
+  color: var(--btn-text);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px;
+}
+
+/* クラシックな中身領域 */
+.content-empty{
+  height:100px;
+  margin-top:2px;
+  background:#ffffff;
+}
+.content-pattern{
+  margin-top:2px;
+  padding:10px;
+  height:100px;
+  background:#ffffff;
+  color: var(--content-text);
+  font-size:13px;
+  line-height:1.2;
+}
+
+/* 入力欄 */
+.input{
+  width:250px; height:28px;
+  background:#ffffff;
+}
+
+/* ボタン */
+.button{
+  width:100px;
+  padding:5px 0;
+  text-align:center;
+  background: var(--btn-face);
+  color: var(--btn-text);
+  font-size:12px;
+  font-weight:bold;
+}
+
+/* 吹き出し（古PCのヘルプっぽい） */
+.bubble{
+  width:200px;
+  min-height:40px;
+  padding:12px;
+  background:#ffffe1;
+  color:#000;
+  position:relative;
+  font-weight:bold;
+}
+.bubble::after{
+  content:"";
+  position:absolute;
+  bottom:-12px;
+  left:24px;
+  border-width:12px 12px 0 0;
+  border-style:solid;
+  border-color:#ffffe1 transparent transparent transparent;
+}
+
+/* プログレス */
+.progress-bg{
+  width:250px; height:18px;
+  background:#ffffff;
+}
+.progress-fill{
+  width:170px; height:14px;
+  margin:2px;
+  background: repeating-linear-gradient(90deg, #000080, #000080 6px, #1084d0 6px, #1084d0 12px);
+}
+
+:root{
+  --hi: #ffffff;
+  --mid: #c0c0c0;
+  --lo: #808080;
+  --lo2: #000000;
+  --title-a: #000080;
+  --title-b: #000080;
+  --title-text: #ffffff;
+  --content-text: #000000;
+  --shadow: rgba(0,0,0,0.20);
+  --btn-face: #c0c0c0;
+  --btn-text: #000000;
+}
+
+
+/* Win3.1っぽく：ベタ塗り＆細いUI */
+.window{ padding:2px; }
+.titlebar{ background: var(--title-a); }
+.content-pattern{ font-family: "MS Sans Serif", sans-serif; }
+
+
+/* 種別ごとのタイトル色（古Windowsっぽい単純差分） */
+.theme-default .titlebar{ }
+.theme-info .titlebar{ background: linear-gradient(90deg, #0050a0, #2aa1ff); }
+.theme-warn .titlebar{ background: linear-gradient(90deg, #7a4a00, #ffb000); }
+.theme-error .titlebar{ background: linear-gradient(90deg, #7a0000, #ff3b3b); }
+.theme-glitch .titlebar{ background: repeating-linear-gradient(45deg, #000080, #000080 6px, #ffffff 6px, #ffffff 12px); color:#000; }
+.theme-glitch .content-pattern{ background:#fff; color:#000; font-family: "Courier New", monospace; }
+
+  </style>
+</head>
+<body>
+
+  <div class="catalog-item">
+    <span class="label">汎用ウィンドウ（文字はUnityで乗せる用）</span>
+    <div class="window border-outset theme-default">
+      <div class="titlebar">
+        <span>Program Manager</span>
+        <div class="win-controls">
+          <div class="win-btn border-outset">_</div>
+          <div class="win-btn border-outset">□</div>
+          <div class="win-btn border-outset">X</div>
+        </div>
+      </div>
+      <div class="content-empty border-inset"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">Infoウィンドウ</span>
+    <div class="window border-outset theme-info">
+      <div class="titlebar">
+        <span>Information</span>
+        <div class="win-controls">
+          <div class="win-btn border-outset">_</div>
+          <div class="win-btn border-outset">□</div>
+          <div class="win-btn border-outset">X</div>
+        </div>
+      </div>
+      <div class="content-empty border-inset"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">Warningウィンドウ</span>
+    <div class="window border-outset theme-warn">
+      <div class="titlebar">
+        <span>Warning</span>
+        <div class="win-controls">
+          <div class="win-btn border-outset">_</div>
+          <div class="win-btn border-outset">□</div>
+          <div class="win-btn border-outset">X</div>
+        </div>
+      </div>
+      <div class="content-empty border-inset"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">Errorウィンドウ</span>
+    <div class="window border-outset theme-error">
+      <div class="titlebar">
+        <span>Error</span>
+        <div class="win-controls">
+          <div class="win-btn border-outset">_</div>
+          <div class="win-btn border-outset">□</div>
+          <div class="win-btn border-outset">X</div>
+        </div>
+      </div>
+      <div class="content-empty border-inset"></div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">バグ・グリッチウィンドウ（文字入りサンプル）</span>
+    <div class="window border-outset theme-glitch">
+      <div class="titlebar">
+        <span>Unhandled Exception</span>
+        <div class="win-controls">
+          <div class="win-btn border-outset">_</div>
+          <div class="win-btn border-outset">□</div>
+          <div class="win-btn border-outset">X</div>
+        </div>
+      </div>
+      <div class="content-pattern border-inset">Fatal Exception 0E
+<br>at 0028:C0011E36
+<br>Press any key to continue…</div>
+    </div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">入力欄（空）</span>
+    <div class="input border-inset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">汎用ボタン（空）</span>
+    <div class="button border-outset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">吹き出し（空）</span>
+    <div class="bubble border-outset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">プログレスバー（①外枠）</span>
+    <div class="progress-bg border-inset"></div>
+  </div>
+
+
+  <div class="catalog-item">
+    <span class="label">プログレスバー（②中身）</span>
+    <div class="progress-fill"></div>
+  </div>
+
+</body>
+</html>

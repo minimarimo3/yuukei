@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -l \"SpeechBubbleController\" \"C:\\\\Users\\\\minimarimo3\\\\Sagyouba\\\\Yuukei\\\\Yuukei/Assets/Scripts\"/*.cs)"
+    ]
+  }
+}

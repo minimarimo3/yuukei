@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Theme: Clear Soda</title>
+    <style>
+        body {
+            background-color: #343a40;
+            color: #4dabf7;
+            font-family: 'Hiragino Maru Gothic ProN', sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .label {
+            color: #f8f9fa;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .item-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* 共通クリア枠 */
+        .clear-box {
+            border-radius: 8px;
+            border: 1px solid #d0ebff;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 15px rgba(116, 192, 252, 0.2);
+        }
+
+        /* 1. Input Box */
+        .moe-input {
+            width: 200px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid #74c0fc;
+            background-color: #f8fbff;
+        }
+
+        /* 2. Button */
+        .moe-btn {
+            padding: 8px 24px;
+            border-radius: 4px;
+            background-color: #fff;
+            color: #339af0;
+            border: 1px solid #339af0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* 3. 吹き出し */
+        .moe-bubble {
+            position: relative;
+            width: 160px;
+            padding: 12px;
+            background-color: #fff;
+            border-radius: 8px;
+            border: 1px solid #74c0fc;
+            color: #339af0;
+            text-align: center;
+        }
+
+        .moe-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 24px;
+            border-width: 8px 8px 0 0;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        .moe-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 23px;
+            z-index: -1;
+            border-width: 10px 10px 0 0;
+            border-style: solid;
+            border-color: #74c0fc transparent transparent transparent;
+        }
+
+        /* ウィンドウ共通 */
+        .soft-window {
+            width: 280px;
+            overflow: hidden;
+        }
+
+        .title-bar {
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background-color: #e7f5ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: #339af0;
+        }
+
+        .content {
+            padding: 15px;
+            min-height: 60px;
+            background-color: #f8fbff;
+            font-size: 13px;
+            border-top: 1px dashed #a5d8ff;
+        }
+
+        /* 4. Warning Window */
+        .win-warn {
+            border-color: #ffc078;
+        }
+
+        .win-warn .title-bar {
+            color: #f59f00;
+            border-bottom: 1px dashed #ffc078;
+        }
+
+        .win-warn .close-btn {
+            color: #f59f00;
+            background-color: #fff4e6;
+        }
+
+        .win-warn .content {
+            border-top: none;
+            background-color: #fff;
+        }
+
+        /* 5. Error Window */
+        .win-err {
+            border-color: #ffa8a8;
+        }
+
+        .win-err .title-bar {
+            color: #fa5252;
+            border-bottom: 1px dashed #ffa8a8;
+        }
+
+        .win-err .close-btn {
+            color: #fa5252;
+            background-color: #fff0f0;
+        }
+
+        .win-err .content {
+            border-top: none;
+            background-color: #fff;
+        }
+
+        /* 6. Bugged Error Window (文字化け・ズレ) */
+        .win-bug {
+            border: 1px solid #fa5252;
+            position: relative;
+            left: -2px;
+        }
+
+        .win-bug .title-bar {
+            background-color: #fa5252;
+            color: #fff;
+        }
+
+        .win-bug .content {
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(250, 82, 82, 0.1) 2px, rgba(250, 82, 82, 0.1) 4px);
+            color: #fa5252;
+        }
+
+        /* 7. Info Window */
+        .win-info {
+            border-color: #d0ebff;
+        }
+
+        .win-info .title-bar {
+            color: #339af0;
+        }
+
+        /* 8. Progress BG */
+        .prog-bg {
+            width: 220px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e7f5ff;
+            border: 1px solid #74c0fc;
+        }
+
+        /* 9. Progress Fill */
+        .prog-fill {
+            width: 160px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #74c0fc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="item-container">
+        <div class="label">1. Text Area</div>
+        <div class="moe-input"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">2. Button</div>
+        <div class="moe-btn">Send</div>
+    </div>
+    <div class="item-container">
+        <div class="label">3. Speech Bubble</div>
+        <div class="moe-bubble clear-box">Wait!</div>
+    </div>
+    <div class="item-container">
+        <div class="label">4. Warning Window</div>
+        <div class="soft-window clear-box win-warn">
+            <div class="title-bar"><span>⚠ Notice</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">5. Error Window</div>
+        <div class="soft-window clear-box win-err">
+            <div class="title-bar"><span>✖ Failed</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">6. Bugged Window</div>
+        <div class="soft-window clear-box win-bug">
+            <div class="title-bar"><span>E r r o r</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content">System Offline...</div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">7. Info Window</div>
+        <div class="soft-window clear-box win-info">
+            <div class="title-bar"><span>ℹ Info</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">8. Progress (BG)</div>
+        <div class="prog-bg"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">9. Progress (Fill)</div>
+        <div class="prog-fill"></div>
+    </div>
+</body>
+
+</html>

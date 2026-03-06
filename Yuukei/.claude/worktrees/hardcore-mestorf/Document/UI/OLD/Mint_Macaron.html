@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Theme: Mint Macaron</title>
+    <style>
+        body {
+            background-color: #495057;
+            color: #333;
+            font-family: 'Hiragino Maru Gothic ProN', sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .label {
+            color: #f8f9fa;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .item-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* 共通マカロン枠（太めのボーダー） */
+        .macaron-box {
+            border: 3px solid #b2f2bb;
+            border-radius: 12px;
+            background-color: #fff;
+        }
+
+        /* 1. Input Box */
+        .moe-input {
+            width: 200px;
+            height: 32px;
+            border-radius: 8px;
+            border: 3px solid #b2f2bb;
+            background-color: #e3fafc;
+        }
+
+        /* 2. Button */
+        .moe-btn {
+            padding: 8px 24px;
+            border-radius: 12px;
+            border: 3px solid #b2f2bb;
+            background-color: #e3fafc;
+            color: #0ca678;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* 3. 吹き出し */
+        .moe-bubble {
+            position: relative;
+            width: 160px;
+            padding: 12px;
+            background-color: #fff;
+            border: 3px solid #b2f2bb;
+            border-radius: 12px;
+            color: #20c997;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .moe-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 24px;
+            border-width: 12px 12px 0 0;
+            border-style: solid;
+            border-color: #b2f2bb transparent transparent transparent;
+        }
+
+        .moe-bubble::before {
+            /* 吹き出しの内側の色 */
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 26px;
+            z-index: 1;
+            border-width: 8px 8px 0 0;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        /* ウィンドウ共通 */
+        .soft-window {
+            width: 280px;
+            overflow: hidden;
+        }
+
+        .title-bar {
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .close-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background-color: #b2f2bb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .content {
+            padding: 15px;
+            min-height: 60px;
+            background-color: #fff;
+            font-size: 13px;
+            border-top: 3px solid #b2f2bb;
+        }
+
+        /* 4. Warning Window */
+        .win-warn {
+            border-color: #ffd43b;
+        }
+
+        .win-warn .title-bar {
+            background-color: #fff9db;
+            color: #f08c00;
+        }
+
+        .win-warn .content {
+            border-top-color: #ffd43b;
+        }
+
+        .win-warn .close-btn {
+            background-color: #ffd43b;
+        }
+
+        /* 5. Error Window */
+        .win-err {
+            border-color: #ff8787;
+        }
+
+        .win-err .title-bar {
+            background-color: #ffe3e3;
+            color: #e03131;
+        }
+
+        .win-err .content {
+            border-top-color: #ff8787;
+        }
+
+        .win-err .close-btn {
+            background-color: #ff8787;
+        }
+
+        /* 6. Bugged Error Window */
+        .win-bug {
+            border: 3px dashed #ff8787;
+            transform: skewX(-5deg);
+            background-color: #fff0f0;
+        }
+
+        .win-bug .title-bar {
+            background-color: #ff8787;
+            color: #fff;
+            text-shadow: 2px 2px 0 #e03131;
+        }
+
+        .win-bug .content {
+            border-top: none;
+            color: #e03131;
+        }
+
+        /* 7. Info Window */
+        .win-info {
+            border-color: #b2f2bb;
+        }
+
+        .win-info .title-bar {
+            background-color: #e3fafc;
+            color: #0ca678;
+        }
+
+        .win-info .content {
+            border-top-color: #b2f2bb;
+            color: #20c997;
+        }
+
+        /* 8. Progress BG */
+        .prog-bg {
+            width: 220px;
+            height: 20px;
+            border-radius: 10px;
+            border: 3px solid #dee2e6;
+            background-color: #fff;
+        }
+
+        /* 9. Progress Fill */
+        .prog-fill {
+            width: 160px;
+            height: 14px;
+            border-radius: 7px;
+            background-color: #b2f2bb;
+            margin: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="item-container">
+        <div class="label">1. Text Area</div>
+        <div class="moe-input"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">2. Button</div>
+        <div class="moe-btn">PUSH</div>
+    </div>
+    <div class="item-container">
+        <div class="label">3. Speech Bubble</div>
+        <div class="moe-bubble">Hello!</div>
+    </div>
+    <div class="item-container">
+        <div class="label">4. Warning Window</div>
+        <div class="soft-window macaron-box win-warn">
+            <div class="title-bar"><span>⚠ 確認してね</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">5. Error Window</div>
+        <div class="soft-window macaron-box win-err">
+            <div class="title-bar"><span>✖ エラー発生</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">6. Bugged Window</div>
+        <div class="soft-window macaron-box win-bug">
+            <div class="title-bar"><span>E R R O R</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content">みつからないよ</div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">7. Info Window</div>
+        <div class="soft-window macaron-box win-info">
+            <div class="title-bar"><span>ℹ おしらせ</span>
+                <div class="close-btn">✖</div>
+            </div>
+            <div class="content"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">8. Progress (BG)</div>
+        <div class="prog-bg"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">9. Progress (Fill)</div>
+        <div class="prog-fill"></div>
+    </div>
+</body>
+
+</html>

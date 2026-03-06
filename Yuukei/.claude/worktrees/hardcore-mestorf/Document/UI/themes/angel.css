@@ -1,0 +1,15 @@
+/* themes/angel.css */
+:root {
+  --hi: #ffffff;
+  --lo: #7fe6ff;
+  --win-bg: #f7fbff;
+  --shadow: rgba(110, 210, 255, 0.22);
+  --txt: #0a4a66;
+  --dot: rgba(90, 200, 255, 0.8);
+  --title-a: #7fe6ff;
+  --title-b: #e7f6ff;
+  --title-shadow: rgba(255, 255, 255, 0.7);
+  --btn-bg: #b9f2ff;
+  --btn-hover: #e7f6ff;
+  --btn-active: #7fe6ff;
+}

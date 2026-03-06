@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Theme: Retro Internet (Pink)</title>
+    <style>
+        body {
+            background-color: #2b2b2b;
+            color: #000;
+            font-family: 'MS PGothic', sans-serif;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .label {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .item-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        /* 共通立体枠 */
+        .outset {
+            border-top: 2px solid #fff;
+            border-left: 2px solid #fff;
+            border-right: 2px solid #808080;
+            border-bottom: 2px solid #808080;
+        }
+
+        .inset {
+            border-top: 2px solid #808080;
+            border-left: 2px solid #808080;
+            border-right: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+        }
+
+        /* 1. Input Box */
+        .moe-input {
+            width: 200px;
+            height: 30px;
+            background-color: #fff;
+        }
+
+        /* 2. Button */
+        .moe-btn {
+            padding: 4px 16px;
+            background-color: #ffccff;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        /* 3. 吹き出し */
+        .moe-bubble {
+            position: relative;
+            width: 150px;
+            padding: 10px;
+            background-color: #fff0f5;
+            border: 2px dotted #ff66b2;
+            text-align: center;
+            color: #cc0066;
+        }
+
+        .moe-bubble::after {
+            /* 尻尾 */
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 20px;
+            border-width: 12px 12px 0 0;
+            border-style: solid;
+            border-color: #fff0f5 transparent transparent transparent;
+        }
+
+        /* ウィンドウ共通 */
+        .moe-window {
+            width: 280px;
+            background-color: #ffccff;
+            padding: 3px;
+        }
+
+        .title-bar {
+            padding: 2px 4px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+        }
+
+        .close-btn {
+            width: 14px;
+            height: 14px;
+            background-color: #c0c0c0;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+        }
+
+        .content {
+            background-color: #fff;
+            min-height: 60px;
+            margin-top: 3px;
+            padding: 8px;
+        }
+
+        /* 4. Warning Window */
+        .win-warn .title-bar {
+            background: linear-gradient(90deg, #ffcc00, #ffea80);
+            color: #806600;
+        }
+
+        /* 5. Error Window */
+        .win-err .title-bar {
+            background: linear-gradient(90deg, #ff007f, #ff80bf);
+        }
+
+        /* 6. Bugged Error Window */
+        .win-bug {
+            transform: skewX(-3deg);
+            box-shadow: 4px 0px 0px #00ffff, -4px 0px 0px #ff00ff;
+            border-color: #000;
+        }
+
+        .win-bug .title-bar {
+            background: repeating-linear-gradient(45deg, #000, #000 4px, #ff007f 4px, #ff007f 8px);
+            color: #fff;
+            letter-spacing: -1px;
+        }
+
+        .win-bug .content {
+            background-color: #000;
+            color: #ff007f;
+            border: 2px dashed #ff007f;
+        }
+
+        /* 7. Info Window */
+        .win-info .title-bar {
+            background: linear-gradient(90deg, #00ccff, #80e5ff);
+            color: #004d66;
+        }
+
+        /* 8. Progress BG */
+        .prog-bg {
+            width: 200px;
+            height: 20px;
+            background-color: #e6e6e6;
+        }
+
+        /* 9. Progress Fill */
+        .prog-fill {
+            width: 150px;
+            height: 16px;
+            background: linear-gradient(90deg, #ff66b2, #ffb3d9);
+            margin: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="item-container">
+        <div class="label">1. Text Area</div>
+        <div class="moe-input inset"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">2. Button</div>
+        <div class="moe-btn outset">OK</div>
+    </div>
+    <div class="item-container">
+        <div class="label">3. Speech Bubble</div>
+        <div class="moe-bubble">Hello!</div>
+    </div>
+    <div class="item-container">
+        <div class="label">4. Warning Window</div>
+        <div class="moe-window outset win-warn">
+            <div class="title-bar"><span>⚠ WARNING</span>
+                <div class="close-btn outset">X</div>
+            </div>
+            <div class="content inset"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">5. Error Window</div>
+        <div class="moe-window outset win-err">
+            <div class="title-bar"><span>❌ ERROR</span>
+                <div class="close-btn outset">X</div>
+            </div>
+            <div class="content inset"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">6. Bugged Window</div>
+        <div class="moe-window outset win-bug">
+            <div class="title-bar"><span>F A T A L E R R O R</span>
+                <div class="close-btn outset">X</div>
+            </div>
+            <div class="content inset">0x000F...<br>System Halted.</div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">7. Info Window</div>
+        <div class="moe-window outset win-info">
+            <div class="title-bar"><span>ℹ INFORMATION</span>
+                <div class="close-btn outset">X</div>
+            </div>
+            <div class="content inset"></div>
+        </div>
+    </div>
+    <div class="item-container">
+        <div class="label">8. Progress (BG)</div>
+        <div class="prog-bg inset"></div>
+    </div>
+    <div class="item-container">
+        <div class="label">9. Progress (Fill)</div>
+        <div class="prog-fill"></div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "angel",
+    "name": "Angel (ライトブルー)",
+    "file": "themes/angel.css"
+  },
+  {
+    "id": "moe",
+    "name": "Moe (ピンク)",
+    "file": "themes/moe.css"
+  }
+]

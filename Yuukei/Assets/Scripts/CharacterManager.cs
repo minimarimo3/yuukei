@@ -28,8 +28,7 @@ public class CharacterManager : MonoBehaviour
             configManager.OnConfigLoaded += HandleConfigLoaded;
             configManager.OnCharacterChanged += HandleCharacterChanged;
 
-            if (configManager.Settings != null 
-                && !string.IsNullOrEmpty(configManager.Settings.currentCharacterId))
+            if (configManager.Settings != null)
             {
                 HandleConfigLoaded();
             }
