@@ -58,6 +58,9 @@ public class DaihonScenarioManager : MonoBehaviour
         {
             TriggerManager.Instance.OnSystemEventFired += HandleSystemEvent;
         }
+        
+        // 起動時にローカル台本を読み込む
+        LoadLocalScripts();
     }
 
     private void OnDestroy()
@@ -164,6 +167,12 @@ public class DaihonScenarioManager : MonoBehaviour
                 .Select(p => p.id)
                 .ToList() ?? new List<string>();
 
+            // ローカルスクリプト（単体配布物など）も評価対象に含める
+            if (!activePackages.Contains("LocalScripts"))
+            {
+                activePackages.Add("LocalScripts");
+            }
+
             // §2.6.5 複数シーンの同時成立 / デフォルトシーンのフォールバック
             // Daihon 言語の仕様上、評価は「1つのイベント（ファイル）内」で上から順に行われます。
             // しかし、どのファイルを起動するかはシステム側が「合図」によって見つける必要があります。
@@ -188,7 +197,13 @@ public class DaihonScenarioManager : MonoBehaviour
 
                         if (hasSignal)
                         {
-                            if (Array.IndexOf(sceneMeta.SystemEvents, systemEventName) >= 0)
+                            // ＠マークの有無にかかわらずマッチ判定を行う（§2.6.1）
+                            bool matched = Array.Exists(sceneMeta.SystemEvents, e => 
+                                e == systemEventName || 
+                                e == "@" + systemEventName || 
+                                e == "＠" + systemEventName);
+
+                            if (matched)
                             {
                                 targetScenes.Add(sceneMeta);
                             }
