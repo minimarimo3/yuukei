@@ -107,6 +107,39 @@ public class DaihonScenarioManager : MonoBehaviour
         _variableStores.Remove(packageId);
     }
 
+    public void LoadLocalScripts()
+    {
+        string localScriptsPath = Path.Combine(Application.persistentDataPath, "Daihon");
+        if (!Directory.Exists(localScriptsPath)) return;
+
+        // "LocalScripts" という特別なパッケージIDとして扱う
+        string packageId = "LocalScripts";
+        var info = new PackageScenarioInfo { PackageId = packageId };
+        
+        // .daihon と .txt の両方を検索
+        var files = Directory.GetFiles(localScriptsPath, "*.*", SearchOption.AllDirectories)
+                             .Where(s => s.EndsWith(".daihon") || s.EndsWith(".txt"));
+
+        foreach (var file in files)
+        {
+            string text = File.ReadAllText(file);
+            var metadata = DaihonRunner.ExtractMetadata(text);
+            
+            if (metadata.Count > 0)
+            {
+                info.Scenarios.Add(new ScenarioEntry
+                {
+                    FilePath = file,
+                    ScriptText = text,
+                    Scenes = metadata
+                });
+            }
+        }
+
+        _packages[packageId] = info;
+        Debug.Log($"[DaihonScenarioManager] ローカル台本 {info.Scenarios.Count} 件を解析・登録しました。");
+    }
+
     // ── トリガー実行ルーティング (§2.6.5準拠) ──────────────────────────
 
     private void HandleSystemEvent(TriggerPayload payload)

@@ -132,6 +132,10 @@ private void SwitchPage(string tabId, string pageTitle)
         {
             RenderCharacterTab();
         }
+        else if (tabId == "Tab_Script")
+        {
+            RenderScriptTab();
+        }
         else
         {
             // 他のタブのプレースホルダー
@@ -140,6 +144,11 @@ private void SwitchPage(string tabId, string pageTitle)
             infoLabel.style.marginTop = 10;
             _activePageContent.Add(infoLabel);
         }
+    }
+
+    // TODO: 台本タブのUI構築ロジック
+    private void RenderScriptTab()
+    {
     }
 
     // キャラクタータブのUI構築ロジック

@@ -69,6 +69,7 @@ public class PlatformBootstrapper : MonoBehaviour
             var go = new GameObject("DaihonScenarioManager");
             go.AddComponent<DaihonScenarioManager>();
         }
+        DaihonScenarioManager.Instance.LoadLocalScripts();
 
         // メッシュとBoundsの更新を確実に待つ
         await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);

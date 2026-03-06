@@ -20,7 +20,7 @@ public class TimeTrigger : ITriggerPlugin
 
     private int _hour;
     private int _minute;
-    private HashSet<string> _days;
+    private HashSet<string> _days = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     private ITriggerContext _context;
     private bool _firedToday;
     private int _lastCheckedDay = -1;

@@ -19,7 +19,7 @@ public class FileDropTrigger : ITriggerPlugin
 
     public event Action<TriggerPayload> OnFired;
 
-    private HashSet<string> _extensions;
+    private HashSet<string> _extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     private ITriggerContext _context;
 
     public void Initialize(ITriggerContext context)
@@ -31,7 +31,7 @@ public class FileDropTrigger : ITriggerPlugin
     {
         _extensions = extensions != null
             ? new HashSet<string>(extensions.Select(e => e.ToLower()), StringComparer.OrdinalIgnoreCase)
-            : new HashSet<string>();
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>ファイルドロップ時に呼ばれる。</summary>

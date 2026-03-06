@@ -56,13 +56,13 @@ public class FileDropRouter : MonoBehaviour
                 break;
 
             case ".zip":
-            case ".yuupkg":
                 await HandleZipDropAsync(path);
                 break;
 
             case ".daihon":
-                // TODO: 単体台本のインポート（§14.5）
-                Debug.LogWarning("[FileDropRouter] .daihon の単体インポートは未実装です。");
+            case ".txt":
+                //  単体台本のインポート（§14.5）
+                HandleDaihonDrop(path);
                 break;
 
             default:
@@ -159,5 +159,34 @@ public class FileDropRouter : MonoBehaviour
         }
 
         return confirmed;
+    }
+
+    private void HandleDaihonDrop(string sourcePath)
+    {
+        string fileName = Path.GetFileName(sourcePath);
+        string targetDir = Path.Combine(Application.persistentDataPath, "Daihon");
+        
+        if (!Directory.Exists(targetDir))
+        {
+            Directory.CreateDirectory(targetDir);
+        }
+
+        string destPath = Path.Combine(targetDir, fileName);
+
+        try
+        {
+            File.Copy(sourcePath, destPath, true); // 上書き許可
+            Debug.Log($"[FileDropRouter] 台本をインストールしました: {destPath}");
+
+            // DaihonScenarioManagerに変更を通知して再読み込みさせる
+            if (DaihonScenarioManager.Instance != null)
+            {
+                DaihonScenarioManager.Instance.LoadLocalScripts();
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[FileDropRouter] 台本のコピーに失敗しました: {e.Message}");
+        }
     }
 }
