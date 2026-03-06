@@ -37,6 +37,9 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
+    // キャラクターの有無が変化した際に発火するイベント
+    public event Action<bool> OnCharacterPresenceChanged;
+
     public async UniTask RestoreCharacterAsync()
     {
         if (configManager?.Settings == null) return;
@@ -44,6 +47,7 @@ public class CharacterManager : MonoBehaviour
         if (configManager.Settings.savedCharacters == null 
             || configManager.Settings.savedCharacters.Count == 0)
         {
+            OnCharacterPresenceChanged?.Invoke(false);
             Debug.Log("[CharacterManager] キャラクターが未登録です。設定画面を開きます。");
             if (settingsUIManager != null) settingsUIManager.ShowCharacterTab();
             return;
@@ -112,11 +116,16 @@ public class CharacterManager : MonoBehaviour
                     lipSync.InvalidateCache();
                 }
 
+                OnCharacterPresenceChanged?.Invoke(true);
                 Debug.Log($"[CharacterManager] VRMのロードが完了しました: {characterData.name}");
+            } else {
+                OnCharacterPresenceChanged?.Invoke(false);
+                Debug.LogError($"[CharacterManager] VRMのロードが失敗しました: {characterData.name}");
             }
         }
         catch (Exception ex)
         {
+            OnCharacterPresenceChanged?.Invoke(false);
             Debug.LogError($"[CharacterManager] VRMのロードに失敗しました: {ex.Message}\n{ex.StackTrace}");
             _currentVrmInstance = null;
         }

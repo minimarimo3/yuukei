@@ -1070,6 +1070,7 @@ GameObject:
   - component: {fileID: 773190232}
   - component: {fileID: 773190231}
   - component: {fileID: 773190230}
+  - component: {fileID: 773190234}
   m_Layer: 5
   m_Name: Canvas for Popup
   m_TagString: Untagged
@@ -1160,6 +1161,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &773190234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773190229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0662f834696b5b4f8315e6c553ff97f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDependentVisibility
+  _characterManager: {fileID: 1094490350}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1222,6 +1236,7 @@ GameObject:
   - component: {fileID: 845719446}
   - component: {fileID: 845719445}
   - component: {fileID: 845719449}
+  - component: {fileID: 845719450}
   m_Layer: 5
   m_Name: TalkCanvas
   m_TagString: Untagged
@@ -1338,6 +1353,19 @@ MonoBehaviour:
   tailRect: {fileID: 0}
   autoFlipTail: 1
   isTailOriginallyFacingRight: 0
+--- !u!114 &845719450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845719444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0662f834696b5b4f8315e6c553ff97f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDependentVisibility
+  _characterManager: {fileID: 1094490350}
 --- !u!1 &871263446
 GameObject:
   m_ObjectHideFlags: 0
@@ -1662,6 +1690,7 @@ GameObject:
   - component: {fileID: 1120862611}
   - component: {fileID: 1120862610}
   - component: {fileID: 1120862614}
+  - component: {fileID: 1120862615}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -1776,6 +1805,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ObjectToBottomRight
   distanceFromCamera: 10
   margin: {x: 1, y: 1}
+--- !u!114 &1120862615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1120862609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0662f834696b5b4f8315e6c553ff97f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDependentVisibility
+  _characterManager: {fileID: 1094490350}
 --- !u!1 &1124732203
 GameObject:
   m_ObjectHideFlags: 0
