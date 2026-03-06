@@ -38,6 +38,7 @@ public class DaihonScenarioManager : MonoBehaviour
     {
         public string FilePath;
         public string ScriptText;
+        public DaihonParser.DefaultsBlockContext DefaultsBlock;
         public List<DaihonSceneMetadata> Scenes;
     }
 
@@ -87,15 +88,16 @@ public class DaihonScenarioManager : MonoBehaviour
         foreach (var file in files)
         {
             string text = File.ReadAllText(file);
-            var metadata = DaihonRunner.ExtractMetadata(text);
+            var fileMetadata = DaihonRunner.ExtractMetadata(text);
             
-            if (metadata.Count > 0)
+            if (fileMetadata.Scenes.Count > 0)
             {
                 info.Scenarios.Add(new ScenarioEntry
                 {
                     FilePath = file,
                     ScriptText = text,
-                    Scenes = metadata
+                    DefaultsBlock = fileMetadata.DefaultsBlock,
+                    Scenes = fileMetadata.Scenes
                 });
             }
         }
@@ -126,15 +128,16 @@ public class DaihonScenarioManager : MonoBehaviour
         foreach (var file in files)
         {
             string text = File.ReadAllText(file);
-            var metadata = DaihonRunner.ExtractMetadata(text);
+            var fileMetadata = DaihonRunner.ExtractMetadata(text);
             
-            if (metadata.Count > 0)
+            if (fileMetadata.Scenes.Count > 0)
             {
                 info.Scenarios.Add(new ScenarioEntry
                 {
                     FilePath = file,
                     ScriptText = text,
-                    Scenes = metadata
+                    DefaultsBlock = fileMetadata.DefaultsBlock,
+                    Scenes = fileMetadata.Scenes
                 });
             }
         }
@@ -230,7 +233,7 @@ public class DaihonScenarioManager : MonoBehaviour
                         // 条件式（AST）が存在する場合は評価する
                         if (scene.HasCondition && scene.ConditionContext != null)
                         {
-                            conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store);
+                            conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store, scenario.DefaultsBlock);
                         }
 
                         // 評価結果が true の場合のみ実行
@@ -256,7 +259,7 @@ public class DaihonScenarioManager : MonoBehaviour
                         // 条件式（AST）が存在する場合は評価する
                         if (scene.ConditionContext != null)
                         {
-                            conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store);
+                            conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store, scenario.DefaultsBlock);
                         }
 
                         if (conditionResult)

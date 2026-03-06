@@ -24,6 +24,15 @@ namespace Daihon.Unity
     }
 
     /// <summary>
+    /// 台本ファイル全体のメタデータ。
+    /// </summary>
+    public class DaihonFileMetadata
+    {
+        public DaihonParser.DefaultsBlockContext DefaultsBlock { get; set; } // 初期値ブロック
+        public List<DaihonSceneMetadata> Scenes { get; set; } = new List<DaihonSceneMetadata>();
+    }
+
+    /// <summary>
     /// DaihonScript を Unity 上で簡単に実行・解析するためのファサードクラス。
     /// パース → 構文木の生成 → インタープリタ実行（または 解析） を一括で行います。
     /// </summary>
@@ -134,7 +143,8 @@ namespace Daihon.Unity
         public static async UniTask<bool> EvaluateConditionAsync(
             DaihonParser.CondExprContext conditionContext,
             IUniTaskActionHandler actionHandler,
-            IVariableStore variableStore)
+            IVariableStore variableStore,
+            DaihonParser.DefaultsBlockContext defaultsBlockContext = null)
         {
             if (conditionContext == null) return true;
 
@@ -143,6 +153,12 @@ namespace Daihon.Unity
 
             try
             {
+                // 初期値ブロックがあれば先に評価する（条件式で初期値変数を参照する場合があるため）
+                if (defaultsBlockContext != null)
+                {
+                    await visitor.VisitDefaultsBlock(defaultsBlockContext);
+                }
+
                 var result = await visitor.VisitCondExpr(conditionContext);
                 return result.IsTruthy();
             }
@@ -154,20 +170,23 @@ namespace Daihon.Unity
         }
 
         /// <summary>
-        /// 台本ファイルからメタデータ（シーン、合図、条件のAST）を抽出します。
+        /// 台本ファイルからメタデータ（シーン、合図、条件のAST、初期値ブロック）を抽出します。
         /// 実行は行いません。
         /// </summary>
-        public static List<DaihonSceneMetadata> ExtractMetadata(string scriptText)
+        public static DaihonFileMetadata ExtractMetadata(string scriptText)
         {
-            var results = new List<DaihonSceneMetadata>();
-            if (string.IsNullOrEmpty(scriptText)) return results;
+            var result = new DaihonFileMetadata();
+            if (string.IsNullOrEmpty(scriptText)) return result;
             if (!scriptText.EndsWith("\n")) scriptText += "\n";
 
             DaihonParser.FileContext tree = ParseScript(scriptText);
-            if (tree == null) return results;
+            if (tree == null) return result;
 
             var eventDecl = tree.eventDecl();
-            if (eventDecl == null) return results;
+            if (eventDecl == null) return result;
+
+            // 初期値ブロックの保持
+            result.DefaultsBlock = eventDecl.defaultsBlock();
 
             foreach (var scene in eventDecl.scene())
             {
@@ -222,10 +241,10 @@ namespace Daihon.Unity
                     meta.ConditionContext = conditionDecl.condExpr();
                 }
 
-                results.Add(meta);
+                result.Scenes.Add(meta);
             }
 
-            return results;
+            return result;
         }
 
         private static DaihonParser.FileContext ParseScript(string scriptText)
