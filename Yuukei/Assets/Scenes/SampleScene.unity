@@ -1695,7 +1695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VrmaPlayer
   characterManager: {fileID: 1094490350}
-  vrmaPrefab: {fileID: -690036175486859679, guid: c2c0b0e06535e0848a83aaca11b17348, type: 3}
+  vrmaPrefab: {fileID: -690036175486859679, guid: bf612b3abe1533f42b6ccf2f841fb506, type: 3}
 --- !u!114 &1094490350
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,6 +15,19 @@
 └── Yuukei                  # Unityプロジェクト
 ```
 
+## 使用しているライブラリ
+
+### Unityライブラリ
+
+Outline
+univrm
+uniWindowController
+antlr
+
+### モーション
+
+[帝国妖異対策局様のVRoidモーション：歩く](https://tyt.fanbox.cc/posts/10123777)
+
 ## 開発者用
 
 ### ビルド
