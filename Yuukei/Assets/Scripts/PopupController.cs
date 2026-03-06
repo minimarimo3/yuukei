@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,10 @@ public class PopupController : MonoBehaviour
     [SerializeField] private Image _closeButtonImage;
     [SerializeField] private RectTransform _closeButtonRect;
 
+    [Header("Confirm/Cancel Buttons (Optional)")]
+    [SerializeField] private Button _confirmButton;
+    [SerializeField] private Button _cancelButton;
+
     // 動的生成スプライトのキャッシュ（メモリ解放用）
     private Sprite _dynamicBgSprite;
     private Sprite _dynamicIconSprite;
@@ -23,11 +28,22 @@ public class PopupController : MonoBehaviour
     private Sprite _closeHoverSprite;
     private Sprite _closePressedSprite;
 
+    private Action _onConfirm;
+    private Action _onCancel;
+
     private void Awake()
     {
         if (_closeButton != null)
         {
             _closeButton.onClick.AddListener(ClosePopup);
+        }
+        if (_confirmButton != null)
+        {
+            _confirmButton.onClick.AddListener(OnConfirmClicked);
+        }
+        if (_cancelButton != null)
+        {
+            _cancelButton.onClick.AddListener(OnCancelClicked);
         }
     }
 
@@ -104,6 +120,19 @@ public class PopupController : MonoBehaviour
         }
     }
 
+    /// <summary>テーマなしで最小限のメッセージ表示を行う（§7.5セキュリティ警告用）。</summary>
+    public void SetupSimple(string message)
+    {
+        if (_contentText != null) _contentText.text = message;
+    }
+
+    /// <summary>確認・キャンセルコールバックを設定する（§7.5参照）。</summary>
+    public void SetConfirmCallbacks(Action onConfirm, Action onCancel)
+    {
+        _onConfirm = onConfirm;
+        _onCancel = onCancel;
+    }
+
     private void SetupCloseButton(CloseButtonSettings btnSettings, string dirPath)
     {
         _closeButton.transition = Selectable.Transition.SpriteSwap;
@@ -159,8 +188,22 @@ public class PopupController : MonoBehaviour
             _closeButtonRect.anchoredPosition = new Vector2(btnSettings.offset.x, btnSettings.offset.y);
     }
 
+    private void OnConfirmClicked()
+    {
+        _onConfirm?.Invoke();
+        Destroy(gameObject);
+    }
+
+    private void OnCancelClicked()
+    {
+        _onCancel?.Invoke();
+        Destroy(gameObject);
+    }
+
     private void ClosePopup()
     {
+        // 閉じるボタンはキャンセルとして扱う
+        _onCancel?.Invoke();
         Destroy(gameObject);
     }
 

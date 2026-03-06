@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum PopupType
@@ -87,6 +88,42 @@ public class PopupManager : MonoBehaviour
 
             // TODO: Glitchタイプの場合、必要であればここでImageのマテリアルを
             // グリッチシェーダー付きのものに差し替える等の特殊演出を追加できます。
+        }
+    }
+
+    /// <summary>
+    /// 確認ダイアログを表示する（§7.5参照）。
+    /// onConfirm: ユーザーが「はい」を選んだ場合に呼ばれる。
+    /// onCancel: ユーザーが「キャンセル」を選んだ場合に呼ばれる。
+    /// </summary>
+    public void ShowWarning(string message, Action onConfirm, Action onCancel = null)
+    {
+        if (_popupPrefab == null)
+        {
+            Debug.LogWarning("[PopupManager] ポップアップのプレハブが未設定です。確認なしで続行します。");
+            onConfirm?.Invoke();
+            return;
+        }
+
+        PopupThemeSettings settings = _currentPopupsTheme?.warning;
+
+        GameObject popupObj = Instantiate(_popupPrefab, _popupContainer);
+        PopupController controller = popupObj.GetComponent<PopupController>();
+
+        if (controller != null)
+        {
+            if (settings != null && !string.IsNullOrEmpty(_currentThemeDirPath))
+                controller.Setup(settings, message, _currentThemeDirPath);
+            else
+                controller.SetupSimple(message);
+
+            controller.SetConfirmCallbacks(onConfirm, onCancel);
+        }
+        else
+        {
+            // プレハブにコントローラがない場合は確認なしで続行
+            Debug.LogWarning("[PopupManager] PopupController が見つかりません。確認なしで続行します。");
+            onConfirm?.Invoke();
         }
     }
 }
