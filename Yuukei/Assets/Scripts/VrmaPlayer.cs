@@ -21,23 +21,21 @@ public class VrmaPlayer : MonoBehaviour
     }
 
     [ContextMenu("Play VRMA Animation")]
-    public void PlayAnimation()
+    public void PlayAnimation(Vrm10AnimationInstance overridePrefab = null)
     {
         if (characterManager == null || characterManager.CurrentVrmInstance == null) return;
-        if (vrmaPrefab == null) return;
+        var prefab = overridePrefab ?? vrmaPrefab;
+        if (prefab == null) return;
 
         if (_playingInstance != null) Destroy(_playingInstance.gameObject);
 
-        var wasActive = vrmaPrefab.gameObject.activeSelf;
-        vrmaPrefab.gameObject.SetActive(false);
-        _playingInstance = Instantiate(vrmaPrefab);
-        vrmaPrefab.gameObject.SetActive(wasActive);
+        var wasActive = prefab.gameObject.activeSelf;
+        prefab.gameObject.SetActive(false);
+        _playingInstance = Instantiate(prefab);
+        prefab.gameObject.SetActive(wasActive);
         
         var currentVrm = characterManager.CurrentVrmInstance;
 
-        currentVrm.transform.localPosition = Vector3.zero;
-        currentVrm.transform.localRotation = Quaternion.identity;
-        
         _playingInstance.transform.SetParent(currentVrm.transform.parent, false);
         _playingInstance.transform.localPosition = currentVrm.transform.localPosition;
         _playingInstance.transform.localRotation = currentVrm.transform.localRotation;
@@ -61,7 +59,12 @@ public class VrmaPlayer : MonoBehaviour
             }
         }
 
-        _playingInstance.ShowBoxMan(false);
+        // BoxMan（箱人間メッシュ）が存在する場合のみ非表示処理を行うように安全対策を追加
+        if (_playingInstance.BoxMan != null)
+        {
+            _playingInstance.ShowBoxMan(false);
+        }
+
         currentVrm.Runtime.VrmAnimation = _playingInstance;
 
         var anim = _playingInstance.GetComponent<Animation>();
@@ -76,7 +79,18 @@ public class VrmaPlayer : MonoBehaviour
             if (animator != null)
             {
                 _playingInstance.gameObject.SetActive(true);
-                animator.Play(0);
+                
+                // コントローラーがアタッチされていれば最初から再生させる
+                if (animator.runtimeAnimatorController != null)
+                {
+                    animator.Rebind();
+                    animator.Update(0f);
+                }
+                else
+                {
+                    // Controllerがセットされていない場合は親切に警告を出す
+                    Debug.LogWarning($"[VrmaPlayer] {_playingInstance.name} のAnimatorに Controller が割り当てられていないため、アニメーションが再生されません。");
+                }
             }
             else
             {

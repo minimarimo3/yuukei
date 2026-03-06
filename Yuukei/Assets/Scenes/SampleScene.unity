@@ -287,6 +287,7 @@ GameObject:
   - component: {fileID: 256751062}
   - component: {fileID: 256751061}
   - component: {fileID: 256751063}
+  - component: {fileID: 256751064}
   m_Layer: 0
   m_Name: CharacterRoot
   m_TagString: Untagged
@@ -372,6 +373,24 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &256751064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256751060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcda5851220cfd3459770b1ab092d5a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDragController
+  characterManager: {fileID: 1094490350}
+  floatingMotion: {fileID: 256751063}
+  vrmaPlayer: {fileID: 1094490349}
+  dragAnimPrefab: {fileID: 1159154407}
+  longPressDuration: 0.25
+  dragThreshold: 8
 --- !u!1 &274303673
 GameObject:
   m_ObjectHideFlags: 0
@@ -768,6 +787,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &620735191
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.20086
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.01502
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 6.73918
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      propertyPath: m_Name
+      value: X Bot@Female Dynamic Pose (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1159154407}
+  m_SourcePrefab: {fileID: 100100000, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
 --- !u!1 &623380929
 GameObject:
   m_ObjectHideFlags: 0
@@ -1912,6 +1991,138 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1159154406 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 220f7d00ea63297469c31068f0f08102, type: 3}
+  m_PrefabInstance: {fileID: 620735191}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1159154407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159154406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69dfb9ffd7c663f4cadc81e38a377672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: VRM10::UniVRM10.Vrm10AnimationInstance
+  BoxMan: {fileID: 0}
+  preset_happy: 0
+  preset_angry: 0
+  preset_sad: 0
+  preset_relaxed: 0
+  preset_surprised: 0
+  preset_aa: 0
+  preset_ih: 0
+  preset_ou: 0
+  preset_ee: 0
+  preset_oh: 0
+  preset_blink: 0
+  preset_blinkleft: 0
+  preset_blinkright: 0
+  preset_neutral: 0
+  custom_00: 0
+  custom_01: 0
+  custom_02: 0
+  custom_03: 0
+  custom_04: 0
+  custom_05: 0
+  custom_06: 0
+  custom_07: 0
+  custom_08: 0
+  custom_09: 0
+  custom_10: 0
+  custom_11: 0
+  custom_12: 0
+  custom_13: 0
+  custom_14: 0
+  custom_15: 0
+  custom_16: 0
+  custom_17: 0
+  custom_18: 0
+  custom_19: 0
+  custom_20: 0
+  custom_21: 0
+  custom_22: 0
+  custom_23: 0
+  custom_24: 0
+  custom_25: 0
+  custom_26: 0
+  custom_27: 0
+  custom_28: 0
+  custom_29: 0
+  custom_30: 0
+  custom_31: 0
+  custom_32: 0
+  custom_33: 0
+  custom_34: 0
+  custom_35: 0
+  custom_36: 0
+  custom_37: 0
+  custom_38: 0
+  custom_39: 0
+  custom_40: 0
+  custom_41: 0
+  custom_42: 0
+  custom_43: 0
+  custom_44: 0
+  custom_45: 0
+  custom_46: 0
+  custom_47: 0
+  custom_48: 0
+  custom_49: 0
+  custom_50: 0
+  custom_51: 0
+  custom_52: 0
+  custom_53: 0
+  custom_54: 0
+  custom_55: 0
+  custom_56: 0
+  custom_57: 0
+  custom_58: 0
+  custom_59: 0
+  custom_60: 0
+  custom_61: 0
+  custom_62: 0
+  custom_63: 0
+  custom_64: 0
+  custom_65: 0
+  custom_66: 0
+  custom_67: 0
+  custom_68: 0
+  custom_69: 0
+  custom_70: 0
+  custom_71: 0
+  custom_72: 0
+  custom_73: 0
+  custom_74: 0
+  custom_75: 0
+  custom_76: 0
+  custom_77: 0
+  custom_78: 0
+  custom_79: 0
+  custom_80: 0
+  custom_81: 0
+  custom_82: 0
+  custom_83: 0
+  custom_84: 0
+  custom_85: 0
+  custom_86: 0
+  custom_87: 0
+  custom_88: 0
+  custom_89: 0
+  custom_90: 0
+  custom_91: 0
+  custom_92: 0
+  custom_93: 0
+  custom_94: 0
+  custom_95: 0
+  custom_96: 0
+  custom_97: 0
+  custom_98: 0
+  custom_99: 0
 --- !u!1 &1171094533
 GameObject:
   m_ObjectHideFlags: 0
@@ -2864,3 +3075,4 @@ SceneRoots:
   - {fileID: 1124732205}
   - {fileID: 487324548}
   - {fileID: 476427105}
+  - {fileID: 620735191}

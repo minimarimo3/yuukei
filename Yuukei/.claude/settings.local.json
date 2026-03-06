@@ -5,7 +5,9 @@
       "Bash(grep -r \"float\\\\|bobbing\\\\|floating\\\\|animate\\\\|position\" Assets/Scripts/*.cs)",
       "Bash(grep -r \"Rigidbody\\\\|Animator\\\\|Animation\\\\|GetComponent\" Assets/Scripts/*.cs)",
       "Bash(wc -l Assets/Scripts/*.cs)",
-      "Bash(xargs grep -l \"UniTask\\\\|async\\\\|await\")"
+      "Bash(xargs grep -l \"UniTask\\\\|async\\\\|await\")",
+      "Bash(xargs grep -l \"Input\\\\.\\\\|Mouse\\\\|Pointer\\\\|Drag\\\\|drag\")",
+      "Bash(xargs grep -l \"MoveToAsync\\\\|FloatingMotion\")"
     ]
   }
 }
