@@ -1458,6 +1458,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlatformBootstrapper
   settingsUI: {fileID: 627291335}
+  characterManager: {fileID: 0}
+  objectToBottomRight: {fileID: 0}
 --- !u!1 &946246154
 GameObject:
   m_ObjectHideFlags: 0

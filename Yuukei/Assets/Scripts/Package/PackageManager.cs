@@ -29,9 +29,13 @@ public class PackageManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private async void Start()
+    private void Start()
     {
-        // 起動時にインストール済みパッケージをリストア（§16参照）
+        // 起動時の初期化は BootSequenceCoordinator に委譲
+    }
+
+    public async UniTask RestorePackagesAsync()
+    {
         if (ConfigManager.Instance?.Settings?.installedPackages == null) return;
 
         foreach (var pkg in ConfigManager.Instance.Settings.installedPackages)

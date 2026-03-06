@@ -25,13 +25,7 @@ public class CharacterManager : MonoBehaviour
     {
         if (configManager != null)
         {
-            configManager.OnConfigLoaded += HandleConfigLoaded;
             configManager.OnCharacterChanged += HandleCharacterChanged;
-
-            if (configManager.Settings != null)
-            {
-                HandleConfigLoaded();
-            }
         }
     }
 
@@ -39,12 +33,11 @@ public class CharacterManager : MonoBehaviour
     {
         if (configManager != null)
         {
-            configManager.OnConfigLoaded -= HandleConfigLoaded;
             configManager.OnCharacterChanged -= HandleCharacterChanged;
         }
     }
 
-    private void HandleConfigLoaded()
+    public async UniTask RestoreCharacterAsync()
     {
         if (configManager?.Settings == null) return;
 
@@ -57,7 +50,7 @@ public class CharacterManager : MonoBehaviour
         }
 
         var currentId = configManager.Settings.currentCharacterId;
-        LoadCharacterAsync(currentId).Forget();
+        await LoadCharacterAsync(currentId);
     }
 
     private void HandleCharacterChanged(string newCharacterId)

@@ -7,7 +7,7 @@ public class ObjectToBottomRight : MonoBehaviour
 
     private void Start()
     {
-        PositionAtBottomRight();
+        // 起動時の初期化は BootSequenceCoordinator(PlatformBootstrapper) に委譲
     }
 
 

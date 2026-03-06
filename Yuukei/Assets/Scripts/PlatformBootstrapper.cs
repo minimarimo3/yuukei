@@ -1,14 +1,16 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 /// <summary>
 /// プラットフォーム抽象化レイヤーのシーン上エントリーポイント。
-/// IAppIntegration を生成し、ライフサイクルを管理する。
-/// 旧 SystemTrayManager / MultiMonitorEnabler / TaskbarIconHider を置き換える。
+/// IAppIntegration を生成し、ライフサイクルを管理しながら、アプリの起動シーケンスを統括する。
 /// </summary>
 public class PlatformBootstrapper : MonoBehaviour
 {
     [SerializeField] private SettingsUIManager settingsUI;
+    [SerializeField] private CharacterManager characterManager;
+    [SerializeField] private ObjectToBottomRight objectToBottomRight;
 
     private IAppIntegration _appIntegration;
 
@@ -17,28 +19,75 @@ public class PlatformBootstrapper : MonoBehaviour
         _appIntegration = PlatformServiceFactory.CreateAppIntegration();
     }
 
-    private IEnumerator Start()
+    private void Start()
     {
-        // システムトレイアイコンを初期化
-        _appIntegration.InitializeTray(
-            onSettingsRequested: () =>
-            {
-                if (settingsUI != null)
-                    settingsUI.ShowSettings();
-                else
-                    Debug.LogWarning("[PlatformBootstrapper] SettingsUIManager の参照が設定されていません。");
-            },
-            onQuitRequested: Application.Quit
-        );
+        BootSequenceAsync().Forget();
+    }
 
-        // マルチモニター対応
-        _appIntegration.SetupMultiMonitor();
+    private async UniTaskVoid BootSequenceAsync()
+    {
+        Debug.Log("[BootSequence] 1. 設定のロード待機 (ConfigManager.Awakeで完了済)");
 
-        // UniWindowController の初期化完了を待ってからタスクバーを非表示にする
-        yield return new WaitForEndOfFrame();
-        yield return new WaitForSeconds(0.1f);
+        Debug.Log("[BootSequence] 2. パッケージとテーマ・プラグインの復元");
+        if (PackageManager.Instance != null)
+        {
+            await PackageManager.Instance.RestorePackagesAsync();
+        }
 
-        _appIntegration.HideFromTaskbar();
+        Debug.Log("[BootSequence] 3. キャラクターのロード完了待機");
+        if (characterManager == null)
+            characterManager = FindObjectOfType<CharacterManager>();
+            
+        if (characterManager != null)
+        {
+            await characterManager.RestoreCharacterAsync();
+        }
+
+        // メッシュとBoundsの更新を確実に待つ
+        await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
+
+        Debug.Log("[BootSequence] 4. ウィンドウ座標の再計算 (キャラクターメッシュ基準)");
+        if (objectToBottomRight == null)
+            objectToBottomRight = FindObjectOfType<ObjectToBottomRight>();
+
+        var positioners = FindObjectsOfType<ObjectToBottomRight>();
+        foreach (var p in positioners)
+        {
+            p.PositionAtBottomRight();
+        }
+
+        Debug.Log("[BootSequence] 5. OS連携機能の初期化 (タスクトレイ・マルチモニター・タスクバー非表示)");
+        if (_appIntegration != null)
+        {
+            // システムトレイアイコンを初期化
+            _appIntegration.InitializeTray(
+                onSettingsRequested: () =>
+                {
+                    if (settingsUI != null)
+                        settingsUI.ShowSettings();
+                    else
+                        Debug.LogWarning("[PlatformBootstrapper] SettingsUIManager の参照が設定されていません。");
+                },
+                onQuitRequested: Application.Quit
+            );
+
+            // マルチモニター対応
+            _appIntegration.SetupMultiMonitor();
+
+            // UniWindowController の初期化完了を待ってからタスクバーを非表示にする
+            await UniTask.WaitUntil(() => Time.frameCount > 5);
+            await UniTask.Delay(100);
+            
+            _appIntegration.HideFromTaskbar();
+        }
+
+        Debug.Log("[BootSequence] 6. トリガーの監視開始");
+        if (TriggerManager.Instance != null)
+        {
+            TriggerManager.Instance.StartMonitoring();
+        }
+        
+        Debug.Log("[BootSequence] ブートシーケンス完了");
     }
 
     private void Update()

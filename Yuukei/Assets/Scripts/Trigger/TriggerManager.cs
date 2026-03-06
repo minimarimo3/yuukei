@@ -74,7 +74,8 @@ public class TriggerManager : MonoBehaviour
         RegisterPlugin(_systemEventTrigger);
         RegisterPlugin(_fileDropTrigger);
 
-        StartMonitoring();
+        // 監視の開始は BootSequenceCoordinator に委譲
+        // StartMonitoring();
     }
 
     private void Update()
