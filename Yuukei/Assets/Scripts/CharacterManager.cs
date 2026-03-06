@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UniVRM10;
 
@@ -10,6 +10,7 @@ public class CharacterManager : MonoBehaviour
     [Header("Dependencies")]
     [SerializeField] private ConfigManager configManager;
     [SerializeField] private SettingsUIManager settingsUIManager;
+    [SerializeField] private VRMLipSync lipSync;
     
     [Header("Settings")]
     [SerializeField, Tooltip("ロードしたVRMを配置する親オブジェクト")] 
@@ -57,15 +58,15 @@ public class CharacterManager : MonoBehaviour
         }
 
         var currentId = configManager.Settings.currentCharacterId;
-        LoadCharacterAsync(currentId).ConfigureAwait(false);
+        LoadCharacterAsync(currentId).Forget();
     }
 
     private void HandleCharacterChanged(string newCharacterId)
     {
-        LoadCharacterAsync(newCharacterId).ConfigureAwait(false);
+        LoadCharacterAsync(newCharacterId).Forget();
     }
 
-    public async Task LoadCharacterAsync(string characterId)
+    public async UniTask LoadCharacterAsync(string characterId)
     {
         if (string.IsNullOrEmpty(characterId)) return;
         if (configManager?.Settings?.savedCharacters == null) return;
@@ -78,8 +79,13 @@ public class CharacterManager : MonoBehaviour
         }
 
         string path = characterData.filePath;
-        if (!File.Exists(path)) return;
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"[CharacterManager] VRMファイルが見つかりません: {path}");
+            return;
+        }
 
+        // 既存キャラを破棄（§11.3）
         if (_currentVrmInstance != null)
         {
             Destroy(_currentVrmInstance.gameObject);
@@ -101,24 +107,17 @@ public class CharacterManager : MonoBehaviour
                 if (characterRoot != null)
                 {
                     _currentVrmInstance.transform.SetParent(characterRoot, false);
-                    
-                    // 【修正】モデル自身ではなく、親オブジェクトのスケールを大きくする
-                    // characterRoot.localScale = new Vector3(2.3f, 2.3f, 2.3f);
                 }
                 
                 ApplyOutlineRenderingLayer(_currentVrmInstance.gameObject);
 
-                // 【修正】VRMモデル自身のスケールは (1, 1, 1) を維持する
-                // _currentVrmInstance.transform.localScale = Vector3.one;
+                // 配置スクリプトを取得して再計算させる（§11.3）
+                characterRoot?.GetComponent<ObjectToBottomRight>()?.PositionAtBottomRight();
 
-                // 配置スクリプトを取得して再計算させる
-                var positioner = characterRoot.GetComponent<ObjectToBottomRight>();
-                if (positioner != null)
+                // VRMLipSync のキャッシュを無効化する（§11.3）
+                if (lipSync != null)
                 {
-                    Debug.Log($"[CharacterManager] 配置スクリプトを取得しました: {positioner.name}");
-                    positioner.PositionAtBottomRight();
-                } else {
-                    Debug.Log($"[CharacterManager] 配置スクリプトを取得できませんでした。");
+                    lipSync.InvalidateCache();
                 }
 
                 Debug.Log($"[CharacterManager] VRMのロードが完了しました: {characterData.name}");
@@ -127,6 +126,7 @@ public class CharacterManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"[CharacterManager] VRMのロードに失敗しました: {ex.Message}\n{ex.StackTrace}");
+            _currentVrmInstance = null;
         }
     }
 

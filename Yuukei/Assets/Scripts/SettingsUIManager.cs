@@ -5,6 +5,8 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(UIDocument))]
 public class SettingsUIManager : MonoBehaviour
 {
+    public static SettingsUIManager Instance { get; private set; }
+
     private UIDocument _uiDocument;
     private VisualElement _rootContainer;
     private VisualElement _settingsPanel;
@@ -36,6 +38,13 @@ public class SettingsUIManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         _uiDocument = GetComponent<UIDocument>();
         var root = _uiDocument.rootVisualElement;
 

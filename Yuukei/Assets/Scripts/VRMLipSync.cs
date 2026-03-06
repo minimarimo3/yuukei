@@ -208,6 +208,15 @@ public class VRMLipSync : MonoBehaviour
     // Internal helpers
     // ================================================================
 
+    /// <summary>
+    /// キャッシュされた VRM インスタンスを無効化する。
+    /// CharacterManager がキャラクターを切り替えた後に呼ぶ（§11.3参照）。
+    /// </summary>
+    public void InvalidateCache()
+    {
+        _cachedVrm = null;
+    }
+
     private Vrm10Instance GetVrmInstance()
     {
         if (_cachedVrm != null) return _cachedVrm;
