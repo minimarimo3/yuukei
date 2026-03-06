@@ -26,6 +26,26 @@ public class PlatformBootstrapper : MonoBehaviour
 
     private async UniTaskVoid BootSequenceAsync()
     {
+
+        Debug.Log("[BootSequence] 0. 描画の一時停止");
+    
+        Camera mainCam = Camera.main;
+        int originalCullingMask = 0;
+    
+        // 3Dオブジェクトの描画を停止（メッシュ自体は存在するためBounds計算は可能）
+        if (mainCam != null)
+        {
+            originalCullingMask = mainCam.cullingMask;
+            mainCam.cullingMask = 0; 
+        }
+
+        // UIの描画を停止（Canvasコンポーネントのみを無効化し、RectTransform等の計算は維持）
+        var canvases = FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+        foreach (var c in canvases)
+        {
+            c.enabled = false;
+        }
+
         Debug.Log("[BootSequence] 1. 設定のロード待機 (ConfigManager.Awakeで完了済)");
 
         Debug.Log("[BootSequence] 2. パッケージとテーマ・プラグインの復元");
@@ -81,6 +101,18 @@ public class PlatformBootstrapper : MonoBehaviour
             _appIntegration.HideFromTaskbar();
         }
 
+        Debug.Log("[BootSequence] 6. 描画の再開");
+    
+        // 舞台裏のセットアップが完全に終わったので、幕を上げる
+        if (mainCam != null)
+        {
+            mainCam.cullingMask = originalCullingMask;
+        }
+        foreach (var c in canvases)
+        {
+            c.enabled = true;
+        }
+
         Debug.Log("[BootSequence] 6. トリガーの監視開始");
         if (TriggerManager.Instance != null)
         {
@@ -89,6 +121,7 @@ public class PlatformBootstrapper : MonoBehaviour
         
         Debug.Log("[BootSequence] ブートシーケンス完了");
     }
+
 
     private void Update()
     {
