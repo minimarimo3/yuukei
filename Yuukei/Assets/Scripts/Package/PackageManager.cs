@@ -122,13 +122,6 @@ public class PackageManager : MonoBehaviour
             await ThemeManager.Instance.LoadThemeFromDirectoryAsync(themePath);
         }
 
-        // scripts/triggers.json を登録
-        var triggersJsonPath = Path.Combine(installPath, "scripts", "triggers.json");
-        if (File.Exists(triggersJsonPath) && TriggerManager.Instance != null)
-        {
-            TriggerManager.Instance.RegisterPackageTriggers(packageJson.id, installPath);
-        }
-
         // plugins/ を読み込む
         var pluginsPath = Path.Combine(installPath, "plugins");
         if (Directory.Exists(pluginsPath))
@@ -141,6 +134,12 @@ public class PackageManager : MonoBehaviour
 #else
             Debug.Log("[PackageManager] プラグインはPC版専用のためスキップします。");
 #endif
+        }
+
+        // 台本解析を要求
+        if (DaihonScenarioManager.Instance != null)
+        {
+            DaihonScenarioManager.Instance.LoadPackageScenarios(packageJson.id, installPath);
         }
 
         Debug.Log($"[PackageManager] パッケージ「{packageJson.name}」のインストールが完了しました。");
@@ -156,13 +155,13 @@ public class PackageManager : MonoBehaviour
             return;
         }
 
-        // トリガー登録解除
-        TriggerManager.Instance?.UnregisterPackageTriggers(packageId);
-
 #if UNITY_STANDALONE
         // プラグインのアンロード予約
         PluginLoader.Instance?.MarkForUnloadOnRestart(packageId);
 #endif
+
+        // 台本のアンロード
+        DaihonScenarioManager.Instance?.UnloadPackageScenarios(packageId);
 
         // ディレクトリ削除
         if (Directory.Exists(pkg.installPath))
@@ -206,12 +205,6 @@ public class PackageManager : MonoBehaviour
             await ThemeManager.Instance.LoadThemeFromDirectoryAsync(themePath);
         }
 
-        var triggersJsonPath = Path.Combine(pkg.installPath, "scripts", "triggers.json");
-        if (File.Exists(triggersJsonPath) && TriggerManager.Instance != null)
-        {
-            TriggerManager.Instance.RegisterPackageTriggers(pkg.id, pkg.installPath);
-        }
-
         var pluginsPath = Path.Combine(pkg.installPath, "plugins");
         if (Directory.Exists(pluginsPath))
         {
@@ -223,6 +216,11 @@ public class PackageManager : MonoBehaviour
 #else
             Debug.Log("[PackageManager] プラグインはPC版専用のためスキップします。");
 #endif
+        }
+
+        if (DaihonScenarioManager.Instance != null)
+        {
+            DaihonScenarioManager.Instance.LoadPackageScenarios(pkg.id, pkg.installPath);
         }
     }
 

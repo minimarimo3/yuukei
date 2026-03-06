@@ -13,8 +13,19 @@ using UnityEngine;
 namespace Daihon.Unity
 {
     /// <summary>
-    /// DaihonScript を Unity 上で簡単に実行するためのファサードクラス。
-    /// パース → 構文木の生成 → インタープリタ実行 を一括で行います。
+    /// 各シーンのメタデータ（合図・条件などルーティングに必要な情報）の抽出結果。
+    /// </summary>
+    public class DaihonSceneMetadata
+    {
+        public string SceneName { get; set; }
+        public string[] SystemEvents { get; set; } // 合図
+        public bool HasCondition { get; set; } // 条件の有無
+        public DaihonParser.CondExprContext ConditionContext { get; set; } // 条件式のAST（後で評価するため）
+    }
+
+    /// <summary>
+    /// DaihonScript を Unity 上で簡単に実行・解析するためのファサードクラス。
+    /// パース → 構文木の生成 → インタープリタ実行（または 解析） を一括で行います。
     /// </summary>
     public static class DaihonRunner
     {
@@ -40,29 +51,8 @@ namespace Daihon.Unity
             if (!scriptText.EndsWith("\n"))
                 scriptText += "\n";
 
-            // レキサー・パーサーの初期化
-            var inputStream = new AntlrInputStream(scriptText);
-            var lexer = new DaihonLexer(inputStream);
-            var errors = new List<string>();
-
-            lexer.RemoveErrorListeners();
-            lexer.AddErrorListener(new UnityErrorListener(errors));
-
-            var tokenStream = new CommonTokenStream(lexer);
-            var parser = new DaihonParser(tokenStream);
-            parser.RemoveErrorListeners();
-            parser.AddErrorListener(new UnityErrorListener(errors));
-
-            // パース
-            var tree = parser.file();
-
-            // パースエラーチェック
-            if (errors.Count > 0)
-            {
-                foreach (var error in errors)
-                    Debug.LogError($"[DaihonRunner] パースエラー: {error}");
-                return;
-            }
+            DaihonParser.FileContext tree = ParseScript(scriptText);
+            if (tree == null) return;
 
             // UniTask → Task アダプターを挟んでインタープリタ実行
             var adapter = new UniTaskActionAdapter(actionHandler);
@@ -80,6 +70,163 @@ namespace Daihon.Unity
             {
                 Debug.LogError($"[DaihonRunner] 予期しないエラー: {ex}");
             }
+        }
+
+        /// <summary>
+        /// 指定されたシーンから実行を開始します。
+        /// </summary>
+        public static async UniTask RunSceneAsync(
+            string scriptText,
+            string startSceneName,
+            IUniTaskActionHandler actionHandler,
+            IVariableStore variableStore)
+        {
+            if (string.IsNullOrEmpty(scriptText)) return;
+            if (!scriptText.EndsWith("\n")) scriptText += "\n";
+
+            DaihonParser.FileContext tree = ParseScript(scriptText);
+            if (tree == null) return;
+
+            var adapter = new UniTaskActionAdapter(actionHandler);
+            // DaihonScriptVisitorのコンストラクタ内でジャンプ回数や初期値ブロックの評価が行われるため、
+            // 該当シーンのASTノードを直接Visitします。
+            var visitor = new DaihonScriptVisitor(adapter, variableStore);
+
+            try
+            {
+                // 初期値ブロックを実行 (システム全体としての変数はStoreにあるが、ファイル固有のものがあれば適用)
+                var eventDecl = tree.eventDecl();
+                if (eventDecl?.defaultsBlock() != null)
+                    await visitor.VisitDefaultsBlock(eventDecl.defaultsBlock());
+                
+                // 指定シーンを探して実行
+                var scenes = eventDecl?.scene() ?? Array.Empty<DaihonParser.SceneContext>();
+                var targetScene = Array.Find(scenes, s => s.HEADER_NAME().GetText().Trim() == startSceneName);
+                if (targetScene == null)
+                {
+                    Debug.LogError($"[DaihonRunner] シーン '{startSceneName}' が見つかりません。");
+                    return;
+                }
+
+                await visitor.VisitScene(targetScene);
+            }
+            catch (DaihonRuntimeException ex)
+            {
+                Debug.LogError($"[DaihonRunner] 実行時エラー: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // EventEndException や SceneEndException などアセンブリ内部の制御例外はここで握りつぶし、想定内の動作とする
+                if (ex.GetType().Name == "EventEndException" || ex.GetType().Name == "SceneEndException")
+                {
+                    // 正常終了
+                }
+                else
+                {
+                    Debug.LogError($"[DaihonRunner] 予期しないエラー: {ex}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 台本ファイルからメタデータ（シーン、合図、条件のAST）を抽出します。
+        /// 実行は行いません。
+        /// </summary>
+        public static List<DaihonSceneMetadata> ExtractMetadata(string scriptText)
+        {
+            var results = new List<DaihonSceneMetadata>();
+            if (string.IsNullOrEmpty(scriptText)) return results;
+            if (!scriptText.EndsWith("\n")) scriptText += "\n";
+
+            DaihonParser.FileContext tree = ParseScript(scriptText);
+            if (tree == null) return results;
+
+            var eventDecl = tree.eventDecl();
+            if (eventDecl == null) return results;
+
+            foreach (var scene in eventDecl.scene())
+            {
+                var meta = new DaihonSceneMetadata
+                {
+                    SceneName = scene.HEADER_NAME()?.GetText().Trim() ?? ""
+                };
+
+                // 合図（システムイベント）の抽出
+                var signalDecl = scene.signalDecl();
+                if (signalDecl != null)
+                {
+                    var events = new List<string>();
+                    var sysEventList = signalDecl.systemEventList();
+                    if (sysEventList != null)
+                    {
+                        foreach (var sysEvt in sysEventList.systemEvent())
+                        {
+                            var evtStr = sysEvt.AT_SIGN().GetText();
+                            foreach (var iden in sysEvt.IDENTIFIER())
+                            {
+                                evtStr += "." + iden.GetText();
+                            }
+                            events.Add(evtStr);
+                        }
+                    }
+                    else if (signalDecl.systemEventList()?.systemEvent() != null)
+                    {
+                        // signalDecl は systemEventList を持つ構造
+                        foreach (var sysEvt in signalDecl.systemEventList().systemEvent())
+                        {
+                            var evtStr = sysEvt.AT_SIGN().GetText();
+                            foreach (var iden in sysEvt.IDENTIFIER())
+                            {
+                                evtStr += "." + iden.GetText();
+                            }
+                            events.Add(evtStr);
+                        }
+                    }
+                    meta.SystemEvents = events.ToArray();
+                }
+                else
+                {
+                    meta.SystemEvents = Array.Empty<string>();
+                }
+
+                // 条件式のASTを保持
+                var conditionDecl = scene.conditionDecl();
+                if (conditionDecl != null)
+                {
+                    meta.HasCondition = true;
+                    meta.ConditionContext = conditionDecl.condExpr();
+                }
+
+                results.Add(meta);
+            }
+
+            return results;
+        }
+
+        private static DaihonParser.FileContext ParseScript(string scriptText)
+        {
+            var inputStream = new AntlrInputStream(scriptText);
+            var lexer = new DaihonLexer(inputStream);
+            var errors = new List<string>();
+
+            lexer.RemoveErrorListeners();
+            lexer.AddErrorListener(new UnityErrorListener(errors));
+
+            var tokenStream = new CommonTokenStream(lexer);
+            var parser = new DaihonParser(tokenStream);
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(new UnityErrorListener(errors));
+
+            var tree = parser.file();
+
+            if (errors.Count > 0)
+            {
+                foreach (var error in errors)
+                    Debug.LogError($"[DaihonRunner] パースエラー: {error}");
+                return null;
+            }
+
+            return tree;
         }
 
         /// <summary>

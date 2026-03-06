@@ -63,6 +63,13 @@ public class PlatformBootstrapper : MonoBehaviour
             await characterManager.RestoreCharacterAsync();
         }
 
+        // Script Runner (DaihonScenarioManager) の初期化を確実に行う
+        if (DaihonScenarioManager.Instance == null)
+        {
+            var go = new GameObject("DaihonScenarioManager");
+            go.AddComponent<DaihonScenarioManager>();
+        }
+
         // メッシュとBoundsの更新を確実に待つ
         await UniTask.Yield(PlayerLoopTiming.PostLateUpdate);
 
