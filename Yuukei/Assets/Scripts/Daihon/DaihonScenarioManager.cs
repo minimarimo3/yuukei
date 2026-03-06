@@ -172,29 +172,23 @@ public class DaihonScenarioManager : MonoBehaviour
                     // 候補シーンがなかった場合はデフォルトシーンの評価に進む
                     if (candidateScenes.Count > 0)
                     {
-                        // 候補となる条件付きシーンが見つかったため、順番に実行する
+                        // 候補となる条件付きシーンが見つかったため、順番に評価・可能なら実行する
                         foreach (var scene in candidateScenes)
                         {
-                            // 条件評価はインタープリタ内（DaihonRunner内部）で行わせることもできるが、
-                            // 実装の都合上、C#側で合図に合致したシーンを直接走らせる仕様としています。
-                            // DaihonRunner 側に「合図を指定してファイル全体を評価させるAPI」があれば理想ですが、
-                            // 現在は RunSceneAsync を使って直接シーンを叩きます。
+                            bool conditionResult = true; // 条件がない場合は真とする
                             
-                            // 実際にはシーンの条件を無視して呼び出してはいけないため、
-                            // 最善のアプローチは、「合図」が一致するファイルを見つけたら、
-                            // そのファイルに合図情報を渡して評価を実行させることです。
-                            // ※ 今回の改修ステップとして、いったん「対象シーンをすべて順番に叩く」形にし、
-                            // 条件評価を含める実装を進めます。
+                            // 条件式（AST）が存在する場合は評価する
+                            if (scene.HasCondition && scene.ConditionContext != null)
+                            {
+                                conditionResult = await DaihonRunner.EvaluateConditionAsync(scene.ConditionContext, handler, store);
+                            }
 
-                            // 仕様: 「条件が真となったすべてのシーンを順次実行」
-                            // DaihonRunner.RunSceneAsync は対象シーンの条件を評価せず本体を走らせてしまうため、
-                            // 本来ならASTからの条件評価が必要。
-                            // しかし簡易実装として「合致する合図のシーンを全て呼ぶ」形にする。
-                            
-                            // DaihonRunnerの現状のAPIに基づく限界があるため、
-                            // 少なくとも「合図のあるファイルを抽出して走らせる」という基本的なルーティングを適用します。
-                            await DaihonRunner.RunSceneAsync(scenario.ScriptText, scene.SceneName, handler, store);
-                            anyTriggeredSceneExecuted = true;
+                            // 評価結果が true の場合のみ実行
+                            if (conditionResult)
+                            {
+                                await DaihonRunner.RunSceneAsync(scenario.ScriptText, scene.SceneName, handler, store);
+                                anyTriggeredSceneExecuted = true;
+                            }
                         }
                     }
 

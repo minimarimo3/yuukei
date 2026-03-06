@@ -129,6 +129,31 @@ namespace Daihon.Unity
         }
 
         /// <summary>
+        /// 抽出した条件式 (AST) を評価します。
+        /// </summary>
+        public static async UniTask<bool> EvaluateConditionAsync(
+            DaihonParser.CondExprContext conditionContext,
+            IUniTaskActionHandler actionHandler,
+            IVariableStore variableStore)
+        {
+            if (conditionContext == null) return true;
+
+            var adapter = new UniTaskActionAdapter(actionHandler);
+            var visitor = new DaihonScriptVisitor(adapter, variableStore);
+
+            try
+            {
+                var result = await visitor.VisitCondExpr(conditionContext);
+                return result.IsTruthy();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[DaihonRunner] 条件評価エラー: {ex}");
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 台本ファイルからメタデータ（シーン、合図、条件のAST）を抽出します。
         /// 実行は行いません。
         /// </summary>
