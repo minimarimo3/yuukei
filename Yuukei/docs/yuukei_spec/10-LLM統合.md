@@ -21,6 +21,11 @@ public class LLMBridge : MonoBehaviour
     // 依存（Inspector から注入）
     [SerializeField] private ConfigManager configManager;
 
+    private ICredentialStorage credentialStorage;
+
+    /// <summary>認証情報ストアを注入する。</summary>
+    public void Initialize(ICredentialStorage credentialStorage);
+
     /// <summary>
     /// LLM にメッセージを送信し、応答文字列を返す。
     /// 会話履歴は自動的に保持・送信される。
@@ -153,3 +158,4 @@ Content-Type: application/json
 - **`ClearHistory()` 呼び出し時**：メモリ上の履歴をクリアし、`llm_history.json` を削除する。
 - **最大件数**：履歴が 100 件を超えた場合、古いメッセージから破棄する。
 - **`provider` 変更時**：履歴はクリアしない（異なるプロバイダーでも文脈を維持するため）。
+
