@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /c/Users/minimarimo3/Documents/yuukei/Yuukei/docs/yuukei_spec/*.md /c/Users/minimarimo3/Documents/yuukei/Yuukei/docs/daihon_spec/*.md)"
+    ]
+  }
+}

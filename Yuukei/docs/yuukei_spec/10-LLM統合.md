@@ -18,13 +18,12 @@
 ```csharp
 public class LLMBridge : MonoBehaviour
 {
-    public static LLMBridge Instance { get; private set; }
-
     // 依存（Inspector から注入）
     [SerializeField] private ConfigManager configManager;
 
     /// <summary>
     /// LLM にメッセージを送信し、応答文字列を返す。
+    /// 会話履歴は自動的に保持・送信される。
     /// provider が "none" の場合は空文字を返す。
     /// エラー時は警告ログを出して空文字を返す（例外を投げない）。
     /// </summary>
@@ -32,6 +31,9 @@ public class LLMBridge : MonoBehaviour
         string userMessage,
         string systemPrompt = "",
         CancellationToken ct = default);
+
+    /// <summary>会話履歴をクリアする。</summary>
+    public void ClearHistory();
 }
 ```
 
@@ -58,6 +60,7 @@ Content-Type: application/json
   "model": "{modelName}",
   "messages": [
     { "role": "system", "content": "{systemPrompt}" },
+    ...{会話履歴のメッセージ},
     { "role": "user",   "content": "{userMessage}" }
   ]
 }
@@ -93,6 +96,7 @@ Content-Type: application/json
   "model": "{modelName}",
   "messages": [
     { "role": "system", "content": "{systemPrompt}" },
+    ...{会話履歴のメッセージ},
     { "role": "user",   "content": "{userMessage}" }
   ],
   "stream": false
@@ -122,3 +126,30 @@ Content-Type: application/json
 | 不正なレスポンス形式 | 空文字を返す + エラーログ |
 
 すべてのエラーは **グレースフルデグラデーション**（機能なし状態で継続）を原則とします。
+
+## 7. 会話履歴の永続化
+
+### 7.1 概要
+
+`LLMBridge` は会話履歴を永続的に保持します。過去のやりとりを含めて LLM に送信することで、文脈を踏まえた応答が可能になります。
+
+### 7.2 保存先
+
+会話履歴は `{persistentDataPath}/llm_history.json` に JSON 配列として保存します。
+
+```json
+[
+  { "role": "user",      "content": "今日の天気は？" },
+  { "role": "assistant", "content": "晴れですよ！" },
+  { "role": "user",      "content": "ありがとう" },
+  { "role": "assistant", "content": "どういたしまして！" }
+]
+```
+
+### 7.3 動作仕様
+
+- **起動時**：`llm_history.json` が存在すればロードし、履歴を復元する。
+- **`ChatAsync` 呼び出し時**：ユーザーメッセージと LLM の応答を履歴に追加し、ファイルに保存する。
+- **`ClearHistory()` 呼び出し時**：メモリ上の履歴をクリアし、`llm_history.json` を削除する。
+- **最大件数**：履歴が 100 件を超えた場合、古いメッセージから破棄する。
+- **`provider` 変更時**：履歴はクリアしない（異なるプロバイダーでも文脈を維持するため）。
